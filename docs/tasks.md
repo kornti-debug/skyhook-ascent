@@ -45,9 +45,9 @@ Goal: a small handcrafted scene where basic movement already feels dependable.
 | --- | --- | ---: | --- | --- |
 | M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Done | Scene opens directly and contains a readable test route |
 | M1.2 | Create a minimal gameplay input map for move, look, run, jump, grapple, and restart | 0.5 h | Done | Keyboard and mouse inputs are visible and named clearly |
-| M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Review | Player can traverse the course consistently without unstable grounding |
-| M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Review | Camera does not clip badly during the test route |
-| M1.5 | Tune and verify the complete movement course | 0.5 h | Next | Ten consecutive jump attempts behave consistently; Console is clean |
+| M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Done | Player can traverse the course consistently without unstable grounding |
+| M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Done | Camera does not clip badly during the test route |
+| M1.5 | Tune and verify the complete movement course | 0.5 h | Done | Ten consecutive jump attempts behave consistently; Console is clean |
 
 **Milestone exit:** walking, running, jumping, air control, and the camera are
 playable before any grappling code exists.
@@ -62,8 +62,8 @@ Goal: one satisfying and repeatable jump-grapple-swing-release-land sequence.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M2.1 | Add a clearly marked grapple-anchor component/layer and one large fixed target | 0.75 h | Planned | Only the intended target is considered valid |
-| M2.2 | Add crosshair aiming and a visible gravity-affected hook projectile | 1.5 h | Planned | The projectile follows an arc and misses cleanly |
+| M2.1 | Add a clearly marked grapple-anchor component/layer and one large fixed target | 0.75 h | Done | Only the intended target is considered valid |
+| M2.2 | Add crosshair aiming and a visible gravity-affected hook projectile | 1.5 h | Next | The projectile follows an arc and misses cleanly |
 | M2.3 | Implement attachment, one active rope, rope visualization, and quick miss recovery | 2.0 h | Planned | Valid hits attach; invalid hits return without locking input |
 | M2.4 | Implement swing physics and limited tangential input assistance | 1.5 h | Planned | The player can deliberately build useful swing motion |
 | M2.5 | Preserve momentum on release and support ground/air firing | 1.0 h | Planned | Releasing at different points produces understandable trajectories |
