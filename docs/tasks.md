@@ -63,8 +63,8 @@ Goal: one satisfying and repeatable jump-grapple-swing-release-land sequence.
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
 | M2.1 | Add a clearly marked grapple-anchor component/layer and one large fixed target | 0.75 h | Done | Only the intended target is considered valid |
-| M2.2 | Add crosshair aiming and a visible gravity-affected hook projectile | 1.5 h | Next | The projectile follows an arc and misses cleanly |
-| M2.3 | Implement attachment, one active rope, rope visualization, and quick miss recovery | 2.0 h | Planned | Valid hits attach; invalid hits return without locking input |
+| M2.2 | Add crosshair aiming and a visible gravity-affected hook projectile | 1.5 h | Done | The projectile follows an arc and misses cleanly |
+| M2.3 | Implement attachment, one active rope, rope visualization, and quick miss recovery | 2.0 h | Next | Valid hits attach; invalid hits return without locking input |
 | M2.4 | Implement swing physics and limited tangential input assistance | 1.5 h | Planned | The player can deliberately build useful swing motion |
 | M2.5 | Preserve momentum on release and support ground/air firing | 1.0 h | Planned | Releasing at different points produces understandable trajectories |
 | M2.6 | Build and tune one mandatory grapple gap | 1.25 h | Planned | The complete sequence succeeds repeatedly with base values |
@@ -155,6 +155,6 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Implement **M1.3 only**. Once movement and grounding are verified on the
-handcrafted course, continue with M1.4. Do not implement the entire prototype
-in one batch.
+Implement **M2.3 only**. Attach the existing projectile to valid anchors, show
+one rope, and make invalid hits recover immediately. Swing forces remain in
+M2.4 so attachment can be verified independently.
