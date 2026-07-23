@@ -43,8 +43,8 @@ Goal: a small handcrafted scene where basic movement already feels dependable.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Next | Scene opens directly and contains a readable test route |
-| M1.2 | Create a minimal gameplay input map for move, look, run, jump, grapple, and restart | 0.5 h | Planned | Keyboard and mouse inputs are visible and named clearly |
+| M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Done | Scene opens directly and contains a readable test route |
+| M1.2 | Create a minimal gameplay input map for move, look, run, jump, grapple, and restart | 0.5 h | Next | Keyboard and mouse inputs are visible and named clearly |
 | M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Planned | Player can traverse the course consistently without unstable grounding |
 | M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Planned | Camera does not clip badly during the test route |
 | M1.5 | Tune and verify the complete movement course | 0.5 h | Planned | Ten consecutive jump attempts behave consistently; Console is clean |
@@ -155,5 +155,5 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Implement **M1.1 only**. Once its scene hierarchy and camera view are verified,
-continue with M1.2. Do not implement the entire prototype in one batch.
+Implement **M1.2 only**. Once the input actions and bindings are verified,
+continue with M1.3. Do not implement the entire prototype in one batch.

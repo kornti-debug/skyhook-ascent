@@ -12,7 +12,8 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 - Lightweight architecture selected; the reusable blueprint will not be copied wholesale.
 - MCP for Unity is connected and verified as editor-only development tooling.
 - Initial GitHub baseline created and pushed.
-- Next task: **M1.1**, the handcrafted movement playground scene.
+- Movement playground scene created and verified.
+- Next task: **M1.2**, the minimal gameplay input map.
 
 ## Start here
 
