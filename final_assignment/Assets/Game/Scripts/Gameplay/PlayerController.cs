@@ -16,16 +16,18 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private Transform movementReference;
 
         [Header("Ground Movement")]
-        [SerializeField, Min(0f)] private float walkSpeed = 5f;
-        [SerializeField, Min(0f)] private float runSpeed = 8f;
-        [SerializeField, Min(0f)] private float groundAcceleration = 30f;
-        [SerializeField, Min(0f)] private float groundDeceleration = 40f;
+        [SerializeField, Min(0f)] private float walkSpeed = 6.5f;
+        [SerializeField, Min(0f)] private float runSpeed = 10f;
+        [SerializeField, Min(0f)] private float groundAcceleration = 60f;
+        [SerializeField, Min(0f)] private float groundDeceleration = 75f;
 
         [Header("Air Movement")]
-        [SerializeField, Min(0f)] private float airAcceleration = 10f;
+        [SerializeField, Min(0f)] private float airAcceleration = 24f;
 
         [Header("Jump")]
-        [SerializeField, Min(0f)] private float jumpHeight = 1.6f;
+        [SerializeField, Min(0f)] private float jumpHeight = 1.8f;
+        [SerializeField, Min(1f)] private float fallGravityMultiplier = 2.6f;
+        [SerializeField, Min(1f)] private float jumpCutGravityMultiplier = 3.2f;
         [SerializeField, Range(0f, 0.3f)] private float coyoteTime = 0.12f;
         [SerializeField, Range(0f, 0.3f)] private float jumpBufferTime = 0.12f;
         [SerializeField, Range(0f, 89f)] private float maximumGroundAngle = 50f;
@@ -37,6 +39,7 @@ namespace SkyhookAscent.Gameplay
         private InputAction jumpAction;
         private Vector2 moveInput;
         private bool runHeld;
+        private bool jumpHeld;
         private float jumpQueuedUntil = float.NegativeInfinity;
         private float lastGroundedTime = float.NegativeInfinity;
         private float ignoreGroundUntil = float.NegativeInfinity;
@@ -96,6 +99,7 @@ namespace SkyhookAscent.Gameplay
 
             moveInput = moveAction.ReadValue<Vector2>();
             runHeld = runAction.IsPressed();
+            jumpHeld = jumpAction.IsPressed();
 
             if (jumpAction.WasPressedThisFrame())
             {
@@ -112,6 +116,7 @@ namespace SkyhookAscent.Gameplay
 
             ApplyHorizontalMovement();
             TryJump();
+            ApplyGravityShaping();
         }
 
         private void ApplyHorizontalMovement()
@@ -157,6 +162,29 @@ namespace SkyhookAscent.Gameplay
             jumpQueuedUntil = float.NegativeInfinity;
             lastGroundedTime = float.NegativeInfinity;
             ignoreGroundUntil = Time.time + 0.1f;
+        }
+
+        private void ApplyGravityShaping()
+        {
+            Vector3 velocity = body.linearVelocity;
+            float gravityMultiplier = 1f;
+
+            if (velocity.y < -0.01f)
+            {
+                gravityMultiplier = fallGravityMultiplier;
+            }
+            else if (velocity.y > 0.01f && !jumpHeld)
+            {
+                gravityMultiplier = jumpCutGravityMultiplier;
+            }
+
+            if (gravityMultiplier <= 1f)
+            {
+                return;
+            }
+
+            velocity += Physics.gravity * ((gravityMultiplier - 1f) * Time.fixedDeltaTime);
+            body.linearVelocity = velocity;
         }
 
         private Vector3 GetCameraRelativeDirection(Vector2 input)
@@ -217,6 +245,8 @@ namespace SkyhookAscent.Gameplay
         private void OnValidate()
         {
             runSpeed = Mathf.Max(runSpeed, walkSpeed);
+            fallGravityMultiplier = Mathf.Max(1f, fallGravityMultiplier);
+            jumpCutGravityMultiplier = Mathf.Max(1f, jumpCutGravityMultiplier);
             minimumGroundNormalY = Mathf.Cos(maximumGroundAngle * Mathf.Deg2Rad);
         }
     }
