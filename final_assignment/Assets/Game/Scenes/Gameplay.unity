@@ -659,7 +659,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705153446}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 969773915ce23cf4892f663010b9fdf9, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -719,7 +719,6 @@ MonoBehaviour:
   airAcceleration: 24
   jumpHeight: 1.8
   fallGravityMultiplier: 2.6
-  jumpCutGravityMultiplier: 3.2
   coyoteTime: 0.12
   jumpBufferTime: 0.12
   maximumGroundAngle: 50
