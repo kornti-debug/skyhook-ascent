@@ -13,7 +13,8 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 - MCP for Unity is connected and verified as editor-only development tooling.
 - Initial GitHub baseline created and pushed.
 - Movement playground scene created and verified.
-- Next task: **M1.2**, the minimal gameplay input map.
+- Gameplay input map created and verified.
+- Next task: **M1.3**, player movement and grounded jumping.
 
 ## Start here
 
