@@ -15,10 +15,15 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private GrappleProjectile projectilePrefab;
 
         [Header("Launch")]
-        [SerializeField, Min(0f)] private float launchSpeed = 18f;
-        [SerializeField] private float horizontalSpawnOffset = 0.35f;
+        [SerializeField, Min(0.1f)] private float launchSpeed = 18f;
+        [SerializeField] private float horizontalSpawnOffset;
         [SerializeField] private float verticalSpawnOffset = 0.65f;
         [SerializeField, Min(0f)] private float forwardSpawnOffset = 0.8f;
+
+        [Header("Aim")]
+        [SerializeField, Min(1f)] private float aimDistance = 50f;
+        [SerializeField, Min(0.05f)] private float minimumFlightTime = 0.2f;
+        [SerializeField, Min(0.05f)] private float maximumFlightTime = 1.5f;
 
         private InputAction grappleAction;
         private Collider[] ownerColliders;
@@ -27,6 +32,8 @@ namespace SkyhookAscent.Gameplay
         public GrappleProjectile ActiveProjectile => activeProjectile;
         public bool HasActiveProjectile => activeProjectile != null;
         public GrappleAnchor LastHitAnchor { get; private set; }
+        public Vector3 LastAimPoint { get; private set; }
+        public bool LastShotHadAimTarget { get; private set; }
 
         private void Awake()
         {
@@ -74,21 +81,60 @@ namespace SkyhookAscent.Gameplay
             LastHitAnchor = null;
 
             Transform cameraTransform = aimCamera.transform;
-            Vector3 launchDirection = cameraTransform.forward.normalized;
+            Ray aimRay = aimCamera.ViewportPointToRay(
+                new Vector3(0.5f, 0.5f, 0f));
             Vector3 launchPosition =
                 transform.position +
                 Vector3.up * verticalSpawnOffset +
                 cameraTransform.right * horizontalSpawnOffset +
-                launchDirection * forwardSpawnOffset;
+                aimRay.direction * forwardSpawnOffset;
+            Vector3 launchVelocity = ResolveLaunchVelocity(
+                aimRay,
+                launchPosition);
 
             activeProjectile = Instantiate(
                 projectilePrefab,
                 launchPosition,
-                Quaternion.LookRotation(launchDirection));
+                Quaternion.LookRotation(launchVelocity.normalized));
             activeProjectile.Launch(
-                launchDirection * launchSpeed,
+                launchVelocity,
                 this,
                 ownerColliders);
+        }
+
+        private Vector3 ResolveLaunchVelocity(Ray aimRay, Vector3 launchPosition)
+        {
+            if (Physics.Raycast(
+                aimRay,
+                out RaycastHit hit,
+                aimDistance,
+                Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Ignore))
+            {
+                GrappleAnchor aimedAnchor =
+                    hit.collider.GetComponentInParent<GrappleAnchor>();
+                LastAimPoint = aimedAnchor != null
+                    ? aimedAnchor.AttachmentPosition
+                    : hit.point;
+                LastShotHadAimTarget = true;
+
+                float desiredSpeed = Mathf.Max(0.01f, launchSpeed);
+                float distanceToTarget = Vector3.Distance(
+                    launchPosition,
+                    LastAimPoint);
+                float flightTime = Mathf.Clamp(
+                    distanceToTarget / desiredSpeed,
+                    minimumFlightTime,
+                    maximumFlightTime);
+
+                return
+                    (LastAimPoint - launchPosition) / flightTime -
+                    0.5f * Physics.gravity * flightTime;
+            }
+
+            LastAimPoint = aimRay.GetPoint(aimDistance);
+            LastShotHadAimTarget = false;
+            return aimRay.direction.normalized * launchSpeed;
         }
 
         public void CancelActiveProjectile()
@@ -114,8 +160,13 @@ namespace SkyhookAscent.Gameplay
 
         private void OnValidate()
         {
-            launchSpeed = Mathf.Max(0f, launchSpeed);
+            launchSpeed = Mathf.Max(0.1f, launchSpeed);
             forwardSpawnOffset = Mathf.Max(0f, forwardSpawnOffset);
+            aimDistance = Mathf.Max(1f, aimDistance);
+            minimumFlightTime = Mathf.Max(0.05f, minimumFlightTime);
+            maximumFlightTime = Mathf.Max(
+                minimumFlightTime,
+                maximumFlightTime);
         }
     }
 }

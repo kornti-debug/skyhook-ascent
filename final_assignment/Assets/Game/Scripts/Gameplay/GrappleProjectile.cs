@@ -103,6 +103,7 @@ namespace SkyhookAscent.Gameplay
             }
 
             finished = true;
+            projectileCollider.enabled = false;
             owner?.HandleProjectileFinished(this, hitAnchor);
             Destroy(gameObject);
         }
