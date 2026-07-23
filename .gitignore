@@ -1,0 +1,34 @@
+# Local agent/Codex files
+AGENTS.md
+.codex/
+tmp/
+
+# Unity-generated folders
+final_assignment/[Ll]ibrary/
+final_assignment/[Tt]emp/
+final_assignment/[Oo]bj/
+final_assignment/[Ll]ogs/
+final_assignment/[Uu]ser[Ss]ettings/
+final_assignment/[Mm]emoryCaptures/
+final_assignment/[Rr]ecordings/
+
+# Builds
+final_assignment/[Bb]uild/
+final_assignment/[Bb]uilds/
+
+# Generated IDE files
+final_assignment/*.csproj
+final_assignment/*.sln
+final_assignment/*.suo
+final_assignment/*.user
+final_assignment/*.userprefs
+final_assignment/.vs/
+final_assignment/.idea/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+

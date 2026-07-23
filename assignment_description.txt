@@ -1,0 +1,43 @@
+Please upload here the video for the assignment.
+As it was described (see slides from the first lessons), the video should be between 12 and 35 minutes. The game that you have created PLUS the video should have a workload of ~40 hours in total.
+
+A few important notes:
+
+Please upload your video directly here (either the video file, or a ZIP containing the video) OR upload a txt file, including a link to an online portal where we can watch the video (e.g. YouTube) OR upload a txt file with a download link to the video - in that case make sure, that we can access the file and that it is not only temporary reachable (as it would be with services like WeTransfer).
+The quality of the video is not graded at all. Just make sure that your screen is recorded and that your voice is clearly understandable.
+To be sure this works, make a short test recording just before the actual recording for the assignment and then play that recorded test video file. This can be helpful to check if all settings are good. Then start with the actual recording.
+I recommend using OBS (Open Broadcaster Software | OBS ) for screen recordings, but you can use whatever you like.
+You don't need to cut anything. If you explain something incorrectly and correct yourself afterwards, that's totally fine. Also if you have gaps in your explanations, because e.g. you have to look up something in order to go on: no problem at all.
+In the end the video should give us a very brief impression on the game you did, its features and how it is played in the first part.
+In the second part, please just explain how you implemented the most important parts of the game in Unity.
+We do not grade any 3D models in this course. Also not Audio implementation. So feel free, to use stuff from the asset store or other sources. Or use Unity primitives. Feel free to use WWise or not. Of course, feel free to use stuff you have created on your own - but it's not part of the grade for this assignment and course.
+On the other side: code that you have done on your own is graded.. but you don't have to explain every line (!!). Just the most important/"complex"/interesting parts need to be explained.
+Also complex lighting setups or usage of complex-to-handle third party assets will be graded. However: be sure, that you can explain how/why these things work like they do in your game. It doesn't count if you say "because I've seen that in tutorial XYZ" or "ChatGPT has told me to do so".
+The same with complex animation configurations/input/usage of XR/..... everything that you have done on your own in Unity, that has a certain complexity and you can explain (!).
+The better you can explain your project and show that you understand how the several parts of your game work in general (and work together), the more points you'll get.
+If your video looks more like you've just followed steps without really understanding the core mechanics in your projects, you'll get less points.
+This means: Of course it is allowed to follow tutorials. But you really have to understand what you're doing.
+Be aware: The main source of your grade will be this video. However, if we wanna look up something in your project (because there are some questions from our side, after we've watched the video), we might also look into the project for our own clarification.
+The maximum score you can get for this assignment is 75 + 5 extra bonus points for additional features from Victor.
+Means, if you have done my assignment during the semester and succeeded on each part, you got 15 points (if you not succeeded on everything, you got a little bit less). Scores for this assignment will be entered on the eCampus, on the 19th of July.
+If you succeeded on the XR assignment (every group that participated got full 10 points).
+If you get full points on this assignment, you have another 75 points. If you even get the 5 bonus points (and have everything from the assignments mentioned above), you can even earn up to 105 points in total.
+However, of course, to reach full 75 points for the final Unity project, that project (and your video explanation) has to be very good - so we're not giving away 75 points easily ;).
+You can even use your CCL project as starting point for this assignment. However, the features you're implementing additionally have to be very clearly explained in the video. It's not enough to add just "new levels with the existing mechanics".
+These are the bonus points you could get from Victor (max 5):
+
+.json or external config files +1
+fully running webgl build on GitHub pages +3
+use the fractal trees and change them, or make a procedural generation script of your own +2
+use grapsh or obsidian.md to design for game logic +1
+use linq +1
+
+As announced in my mail from the 31st of May, there are two dealines for the first attempt of this assignment: On the 7th of July, as well as on the 1st of September.
+There will be no difference in grading, if you go for the second deadline - the only difference is that you get your grade a bit later.
+
+If you don't upload anything on any of these two dates or get a negative grade on your work, your first attempt is negative and you'll have to go for a second attempt during the next semester. If that is also negative, you have to do a board exam to pass.
+
+ 
+
+All the best!
+Lucas
