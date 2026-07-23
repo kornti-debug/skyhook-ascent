@@ -32,7 +32,7 @@ Goal: a reproducible project that is ready for feature work.
 | M0.1 | Create the outer Git/documentation root and nested Unity project | done | Done | Unity-generated folders and local agent files are ignored |
 | M0.2 | Review the assignment PDF and lock the game concept and scope | done | Done | Checklist, game design, architecture, roadmap, and video plan agree |
 | M0.3 | Install and connect Unity MCP | done | Done | Codex reads the correct live project and the Console is clean |
-| M0.4 | Create the initial source-control baseline | 0.5 h | Next | One coherent initial commit exists before gameplay implementation |
+| M0.4 | Create the initial source-control baseline | 0.5 h | Done | One coherent initial commit exists before gameplay implementation |
 
 Architecture used here: repository ownership, documentation outside `Assets`,
 project assets under `Assets/Game`, pinned versions, and clean source control.
@@ -43,7 +43,7 @@ Goal: a small handcrafted scene where basic movement already feels dependable.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Planned | Scene opens directly and contains a readable test route |
+| M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Next | Scene opens directly and contains a readable test route |
 | M1.2 | Create a minimal gameplay input map for move, look, run, jump, grapple, and restart | 0.5 h | Planned | Keyboard and mouse inputs are visible and named clearly |
 | M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Planned | Player can traverse the course consistently without unstable grounding |
 | M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Planned | Camera does not clip badly during the test route |
@@ -155,6 +155,5 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Complete the **M0.4 source-control baseline**, then implement **M1.1 only**.
-Once its scene hierarchy and camera view are verified, continue with M1.2. Do
-not implement the entire prototype in one batch.
+Implement **M1.1 only**. Once its scene hierarchy and camera view are verified,
+continue with M1.2. Do not implement the entire prototype in one batch.

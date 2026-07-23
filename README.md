@@ -11,7 +11,8 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 - Game concept locked: a procedural vertical 3D grappling platformer (working title: **Skyhook Ascent**).
 - Lightweight architecture selected; the reusable blueprint will not be copied wholesale.
 - MCP for Unity is connected and verified as editor-only development tooling.
-- Next task: **M0.4**, the initial Git baseline; then **M1.1**, the handcrafted movement playground scene.
+- Initial GitHub baseline created and pushed.
+- Next task: **M1.1**, the handcrafted movement playground scene.
 
 ## Start here
 
