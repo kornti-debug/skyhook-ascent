@@ -16,10 +16,14 @@ namespace SkyhookAscent.Gameplay
         [Header("Orbit")]
         [SerializeField] private Vector3 targetOffset = new Vector3(0f, 0.9f, 0f);
         [SerializeField, Min(0f)] private float distance = 4.5f;
+        [SerializeField] private Vector2 shoulderOffset = new Vector2(0.7f, 0.55f);
+        [SerializeField, Range(-89f, 89f)]
+        [Tooltip("Prevents the camera from orbiting under the player while aiming upward.")]
+        private float minimumOrbitPitch;
         [SerializeField, Range(-89f, 89f)] private float initialPitch = 15f;
         [SerializeField] private float initialYaw;
-        [SerializeField, Range(-89f, 89f)] private float minimumPitch = -25f;
-        [SerializeField, Range(-89f, 89f)] private float maximumPitch = 70f;
+        [SerializeField, Range(-89f, 89f)] private float minimumPitch = -80f;
+        [SerializeField, Range(-89f, 89f)] private float maximumPitch = 80f;
         [SerializeField, Min(0f)] private float mouseSensitivity = 0.12f;
         [SerializeField, Min(0f)] private float gamepadLookSpeed = 120f;
 
@@ -122,25 +126,41 @@ namespace SkyhookAscent.Gameplay
                     ref followVelocity,
                     followSmoothTime);
 
-            Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
-            Vector3 cameraDirection = orbitRotation * Vector3.back;
-            CurrentDistance = ResolveCameraDistance(smoothedPivot, cameraDirection);
-
-            transform.position = smoothedPivot + cameraDirection * CurrentDistance;
-            transform.rotation = Quaternion.LookRotation(
-                smoothedPivot - transform.position,
-                Vector3.up);
+            ApplyCameraTransform(smoothedPivot);
         }
 
-        private float ResolveCameraDistance(Vector3 pivot, Vector3 direction)
+        private void ApplyCameraTransform(Vector3 pivot)
         {
-            float resolvedDistance = distance;
+            Quaternion positionRotation = Quaternion.Euler(
+                Mathf.Max(pitch, minimumOrbitPitch),
+                yaw,
+                0f);
+            Vector3 desiredCameraOffset = positionRotation * new Vector3(
+                shoulderOffset.x,
+                shoulderOffset.y,
+                -distance);
+            Vector3 cameraDirection = desiredCameraOffset.normalized;
+            CurrentDistance = ResolveCameraDistance(
+                pivot,
+                cameraDirection,
+                desiredCameraOffset.magnitude);
+
+            transform.position = pivot + cameraDirection * CurrentDistance;
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+
+        private float ResolveCameraDistance(
+            Vector3 pivot,
+            Vector3 direction,
+            float desiredDistance)
+        {
+            float resolvedDistance = desiredDistance;
             int hitCount = Physics.SphereCastNonAlloc(
                 pivot,
                 collisionRadius,
                 direction,
                 collisionHits,
-                distance,
+                desiredDistance,
                 collisionMask,
                 QueryTriggerInteraction.Ignore);
 
@@ -157,7 +177,7 @@ namespace SkyhookAscent.Gameplay
                     collisionHits[i].distance - collisionPadding);
             }
 
-            return Mathf.Clamp(resolvedDistance, minimumDistance, distance);
+            return Mathf.Clamp(resolvedDistance, minimumDistance, desiredDistance);
         }
 
         private void SnapToTarget()
@@ -169,14 +189,7 @@ namespace SkyhookAscent.Gameplay
 
             smoothedPivot = target.position + targetOffset;
             followVelocity = Vector3.zero;
-
-            Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
-            Vector3 cameraDirection = orbitRotation * Vector3.back;
-            CurrentDistance = ResolveCameraDistance(smoothedPivot, cameraDirection);
-            transform.position = smoothedPivot + cameraDirection * CurrentDistance;
-            transform.rotation = Quaternion.LookRotation(
-                smoothedPivot - transform.position,
-                Vector3.up);
+            ApplyCameraTransform(smoothedPivot);
         }
 
         private void OnValidate()

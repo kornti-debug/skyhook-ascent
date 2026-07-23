@@ -726,10 +726,12 @@ MonoBehaviour:
   target: {fileID: 705153450}
   targetOffset: {x: 0, y: 0.9, z: 0}
   distance: 4.5
+  shoulderOffset: {x: 0.7, y: 0.55}
+  minimumOrbitPitch: 0
   initialPitch: 15
   initialYaw: 0
-  minimumPitch: -25
-  maximumPitch: 70
+  minimumPitch: -80
+  maximumPitch: 80
   mouseSensitivity: 0.12
   gamepadLookSpeed: 120
   followSmoothTime: 0.04
