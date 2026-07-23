@@ -56,8 +56,9 @@ Mandatory grapple chunks ensure the main mechanic cannot be ignored.
 - Camera-relative walking and running
 - Ground acceleration and braking
 - Limited air control
-- Grounded jump
+- Fixed-height grounded jump with a deliberately fast rise and fall
 - Momentum retained when leaving platforms
+- Close third-person orbit camera with basic wall avoidance
 
 The first prototype may use a capsule and primitives. Character animation is not required for the MVP.
 
@@ -216,4 +217,3 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - Camera collision inside the cylindrical tower needs early testing.
 - Generated chunk rotation can create visual intersections even when traversal remains valid.
 - Rising hazard speed must pressure the player without making safe routes pointless.
-

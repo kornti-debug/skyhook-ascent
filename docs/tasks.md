@@ -45,9 +45,9 @@ Goal: a small handcrafted scene where basic movement already feels dependable.
 | --- | --- | ---: | --- | --- |
 | M1.1 | Create `Assets/Game` as needed, a gameplay scene, player capsule, camera, light, floor, and three-platform course | 0.75 h | Done | Scene opens directly and contains a readable test route |
 | M1.2 | Create a minimal gameplay input map for move, look, run, jump, grapple, and restart | 0.5 h | Done | Keyboard and mouse inputs are visible and named clearly |
-| M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Next | Player can traverse the course consistently without unstable grounding |
-| M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Planned | Camera does not clip badly during the test route |
-| M1.5 | Tune and verify the complete movement course | 0.5 h | Planned | Ten consecutive jump attempts behave consistently; Console is clean |
+| M1.3 | Implement camera-relative walk/run, acceleration, braking, grounded jump, and limited air control | 1.5 h | Review | Player can traverse the course consistently without unstable grounding |
+| M1.4 | Implement the third-person follow camera and basic wall avoidance | 0.75 h | Review | Camera does not clip badly during the test route |
+| M1.5 | Tune and verify the complete movement course | 0.5 h | Next | Ten consecutive jump attempts behave consistently; Console is clean |
 
 **Milestone exit:** walking, running, jumping, air control, and the camera are
 playable before any grappling code exists.

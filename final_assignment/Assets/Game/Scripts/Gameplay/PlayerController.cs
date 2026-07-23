@@ -26,6 +26,7 @@ namespace SkyhookAscent.Gameplay
 
         [Header("Jump")]
         [SerializeField, Min(0f)] private float jumpHeight = 1.8f;
+        [SerializeField, Min(1f)] private float riseGravityMultiplier = 1.8f;
         [SerializeField, Min(1f)] private float fallGravityMultiplier = 2.6f;
         [SerializeField, Range(0f, 0.3f)] private float coyoteTime = 0.12f;
         [SerializeField, Range(0f, 0.3f)] private float jumpBufferTime = 0.12f;
@@ -113,7 +114,7 @@ namespace SkyhookAscent.Gameplay
 
             ApplyHorizontalMovement();
             TryJump();
-            ApplyFallGravity();
+            ApplyVerticalGravity();
         }
 
         private void ApplyHorizontalMovement()
@@ -153,7 +154,8 @@ namespace SkyhookAscent.Gameplay
             }
 
             Vector3 velocity = body.linearVelocity;
-            float jumpSpeed = Mathf.Sqrt(Mathf.Max(0f, -2f * Physics.gravity.y * jumpHeight));
+            float jumpSpeed = Mathf.Sqrt(
+                Mathf.Max(0f, -2f * Physics.gravity.y * jumpHeight * riseGravityMultiplier));
             body.linearVelocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
 
             jumpQueuedUntil = float.NegativeInfinity;
@@ -161,15 +163,26 @@ namespace SkyhookAscent.Gameplay
             ignoreGroundUntil = Time.time + 0.1f;
         }
 
-        private void ApplyFallGravity()
+        private void ApplyVerticalGravity()
         {
             Vector3 velocity = body.linearVelocity;
-            if (velocity.y >= -0.01f || fallGravityMultiplier <= 1f)
+            float gravityMultiplier = 1f;
+
+            if (velocity.y > 0.01f)
+            {
+                gravityMultiplier = riseGravityMultiplier;
+            }
+            else if (velocity.y < -0.01f)
+            {
+                gravityMultiplier = fallGravityMultiplier;
+            }
+
+            if (gravityMultiplier <= 1f)
             {
                 return;
             }
 
-            velocity += Physics.gravity * ((fallGravityMultiplier - 1f) * Time.fixedDeltaTime);
+            velocity += Physics.gravity * ((gravityMultiplier - 1f) * Time.fixedDeltaTime);
             body.linearVelocity = velocity;
         }
 
@@ -231,6 +244,7 @@ namespace SkyhookAscent.Gameplay
         private void OnValidate()
         {
             runSpeed = Mathf.Max(runSpeed, walkSpeed);
+            riseGravityMultiplier = Mathf.Max(1f, riseGravityMultiplier);
             fallGravityMultiplier = Mathf.Max(1f, fallGravityMultiplier);
             minimumGroundNormalY = Mathf.Cos(maximumGroundAngle * Mathf.Deg2Rad);
         }
