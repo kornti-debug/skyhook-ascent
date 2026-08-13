@@ -108,7 +108,7 @@ reproducible, testable, and explainable.
 | M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
 | M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
 | M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removes each submerged chunk and deletes a stage root once it becomes empty |
-| M4.10 | Add a round transition landing and rotating stage material palettes | 1.75 h | Done | The landing has a flat mesh collider, a validated 1.25 m upward jump, and cannot obstruct protected jump, landing-headroom, or grapple corridors |
+| M4.10 | Add a round transition landing and rotating stage material palettes | 2.0 h | Done | The landing has a flat mesh collider, a validated 1.25 m upward jump, and cannot obstruct jump/headroom above any traversal platform or any grapple corridor |
 | M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; flood starts at 0.65 m/s and scales visibly with each stage |
 | M4.12 | Add editor-only debug flight for streaming inspection | 0.5 h | Done | F3 toggles collision-free flight with vertical movement and a speed boost; player builds remain unaffected |
 

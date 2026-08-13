@@ -468,7 +468,7 @@ MonoBehaviour:
   seed: 104729
   generatedChunkCount: 24
   recentHistoryLength: 2
-  maximumSeedAttempts: 32
+  maximumSeedAttempts: 64
   randomizeInitialSeed: 1
   endlessMode: 1
   generationAheadDistance: 35

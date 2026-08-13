@@ -261,12 +261,7 @@ namespace SkyhookAscent.Gameplay
 
         public TraversalClearanceSegment GetWorldExitHeadroomClearance()
         {
-            Vector3 standingCenter = exit.position + Vector3.up;
-            Vector3 jumpApexCenter = exit.position + Vector3.up * 2.9f;
-            return new TraversalClearanceSegment(
-                standingCenter,
-                jumpApexCenter,
-                0.6f);
+            return CreateHeadroomClearance(exit.position);
         }
 
         public bool BlocksClearance(TraversalClearanceSegment clearance)
@@ -304,6 +299,39 @@ namespace SkyhookAscent.Gameplay
                 source,
                 protectedEnd,
                 clearanceRadius));
+        }
+
+        public void AppendWorldSurfaceHeadroomClearances(
+            List<TraversalClearanceSegment> output)
+        {
+            if (output == null)
+            {
+                return;
+            }
+
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                Collider candidate = colliders[i];
+                if (!IsTraversalSurface(candidate))
+                {
+                    continue;
+                }
+
+                output.Add(CreateHeadroomClearance(
+                    SurfaceCenter(candidate.bounds)));
+            }
+        }
+
+        private static TraversalClearanceSegment CreateHeadroomClearance(
+            Vector3 surfaceCenter)
+        {
+            Vector3 standingCenter = surfaceCenter + Vector3.up;
+            Vector3 jumpApexCenter = surfaceCenter + Vector3.up * 2.9f;
+            return new TraversalClearanceSegment(
+                standingCenter,
+                jumpApexCenter,
+                0.6f);
         }
 
         private Vector3 GetHorizontalWorldDirection(Vector3 localDirection)

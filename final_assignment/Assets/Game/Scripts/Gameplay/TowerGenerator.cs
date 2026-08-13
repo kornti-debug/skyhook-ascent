@@ -27,7 +27,7 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private int seed = 104729;
         [SerializeField, Min(4)] private int generatedChunkCount = 24;
         [SerializeField, Min(1)] private int recentHistoryLength = 2;
-        [SerializeField, Min(1)] private int maximumSeedAttempts = 32;
+        [SerializeField, Min(1)] private int maximumSeedAttempts = 64;
         [SerializeField] private bool randomizeInitialSeed = true;
 
         [Header("Endless Streaming")]
@@ -576,7 +576,7 @@ namespace SkyhookAscent.Gameplay
             bool forceIdentityRotation,
             bool requirePreviousSeparation = false)
         {
-            int rotationSlotCount = requirePreviousSeparation ? 8 : 4;
+            int rotationSlotCount = requirePreviousSeparation ? 16 : 4;
             int firstRotation = forceIdentityRotation
                 ? 0
                 : random.Next(rotationSlotCount);
@@ -630,6 +630,20 @@ namespace SkyhookAscent.Gameplay
                     clearanceRejections++;
                     DeactivateAndDestroy(instance.gameObject);
                     continue;
+                }
+
+                if (requirePreviousSeparation && previousChunk != null)
+                {
+                    List<TraversalClearanceSegment> surfaceHeadrooms =
+                        new List<TraversalClearanceSegment>();
+                    previousChunk.AppendWorldSurfaceHeadroomClearances(
+                        surfaceHeadrooms);
+                    if (instance.BlocksAnyClearance(surfaceHeadrooms))
+                    {
+                        clearanceRejections++;
+                        DeactivateAndDestroy(instance.gameObject);
+                        continue;
+                    }
                 }
 
                 if (instance.BlocksAnyClearance(protectedClearances))

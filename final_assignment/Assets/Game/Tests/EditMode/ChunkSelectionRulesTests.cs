@@ -157,6 +157,63 @@ namespace SkyhookAscent.Tests
         }
 
         [Test]
+        public void ChunkClearancesProtectInternalPlatformHeadroom()
+        {
+            UnityEngine.GameObject root = new UnityEngine.GameObject("Chunk");
+            try
+            {
+                TowerChunk chunk = root.AddComponent<TowerChunk>();
+                UnityEngine.Transform entry = CreateMarker(
+                    root.transform,
+                    "Entry",
+                    UnityEngine.Vector3.zero);
+                UnityEngine.Transform exit = CreateMarker(
+                    root.transform,
+                    "Exit",
+                    new UnityEngine.Vector3(0f, 4f, 10f));
+                UnityEngine.GameObject internalPlatform =
+                    UnityEngine.GameObject.CreatePrimitive(
+                        UnityEngine.PrimitiveType.Cube);
+                internalPlatform.name = "InternalPlatform";
+                internalPlatform.transform.SetParent(root.transform, false);
+                internalPlatform.transform.localPosition =
+                    new UnityEngine.Vector3(5f, 1f, 5f);
+                internalPlatform.transform.localScale =
+                    new UnityEngine.Vector3(2f, 1f, 2f);
+
+                chunk.Configure(
+                    "test",
+                    entry,
+                    exit,
+                    1,
+                    1,
+                    ChunkTraversalCategory.Jumps);
+                UnityEngine.Physics.SyncTransforms();
+
+                List<TraversalClearanceSegment> clearances =
+                    new List<TraversalClearanceSegment>();
+                chunk.AppendWorldSurfaceHeadroomClearances(clearances);
+                UnityEngine.Bounds lowCeiling = new UnityEngine.Bounds(
+                    new UnityEngine.Vector3(5f, 3.8f, 5f),
+                    new UnityEngine.Vector3(2f, 0.8f, 2f));
+
+                bool blocked = false;
+                for (int i = 0; i < clearances.Count; i++)
+                {
+                    blocked |= ChunkPlacementRules.BoundsBlockSegment(
+                        lowCeiling,
+                        clearances[i]);
+                }
+
+                Assert.That(blocked, Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void StreamingAppendsWhenPlayerEntersAheadWindow()
         {
             Assert.That(TowerStreamingRules.ShouldAppend(100f, 64f, 35f), Is.False);
@@ -213,6 +270,17 @@ namespace SkyhookAscent.Tests
             }
 
             return sequence.ToArray();
+        }
+
+        private static UnityEngine.Transform CreateMarker(
+            UnityEngine.Transform parent,
+            string name,
+            UnityEngine.Vector3 localPosition)
+        {
+            UnityEngine.GameObject marker = new UnityEngine.GameObject(name);
+            marker.transform.SetParent(parent, false);
+            marker.transform.localPosition = localPosition;
+            return marker.transform;
         }
     }
 }

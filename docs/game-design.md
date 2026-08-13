@@ -146,7 +146,7 @@ are then removed.
   preceding platform. Its top is 1.25 metres above the preceding exit, making
   the boundary an ordinary upward jump rather than a same-height obstruction.
   Its placement must also preserve player-sized landing and jump headroom above
-  the preceding platform.
+  every platform in the immediately preceding chunk.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly
