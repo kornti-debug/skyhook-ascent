@@ -114,6 +114,24 @@ namespace SkyhookAscent.Tests
         }
 
         [Test]
+        public void ExitApproachRejectsRecoveryPlatformBlockingZigzagLanding()
+        {
+            TraversalClearanceSegment finalZigzagApproach =
+                new TraversalClearanceSegment(
+                    new UnityEngine.Vector3(3.46f, 110.65f, 5.46f),
+                    new UnityEngine.Vector3(6.47f, 110.65f, 8.47f),
+                    0.6f);
+            UnityEngine.Bounds blockingRecoveryPlatform =
+                new UnityEngine.Bounds(
+                    new UnityEngine.Vector3(3f, 110.05f, 9f),
+                    new UnityEngine.Vector3(6f, 1f, 7f));
+
+            Assert.That(ChunkPlacementRules.BoundsBlockSegment(
+                blockingRecoveryPlatform,
+                finalZigzagApproach), Is.True);
+        }
+
+        [Test]
         public void StreamingAppendsWhenPlayerEntersAheadWindow()
         {
             Assert.That(TowerStreamingRules.ShouldAppend(100f, 64f, 35f), Is.False);

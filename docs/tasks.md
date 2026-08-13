@@ -103,12 +103,12 @@ reproducible, testable, and explainable.
 | M4.2 | Convert four validated sections and create eight derived variants | 1.25 h | Done | Twelve prefab shapes provide jump, zip, mixed, precision, mirrored, and recovery rhythms |
 | M4.3 | Implement plain-C# seeded chunk-selection and pacing rules | 1.0 h | Done | Five focused EditMode tests pass; a category may repeat twice but not three times when alternatives exist |
 | M4.4 | Align and rotate chunk prefabs from exit to entry | 1.0 h | Done | Seed `104729` builds a connected 24-chunk route ending near 97 m |
-| M4.5 | Add overlap, reverse-turn, protected-corridor, history, and fallback validation | 1.0 h | Done | Seed `104729` rejects backward/blocking rotations; a 24-chunk audit reports zero direction or corridor violations |
+| M4.5 | Add overlap, reverse-turn, protected-corridor, adjacent-approach, history, and fallback validation | 1.0 h | Done | Moved colliders synchronize before checks; seed `81189325` rejects the blocking zigzag/recovery pair and streams ten valid stages |
 | M4.6 | Add landing-based finish, generated-run restart, and longer hazard progression | 0.75 h | Done | The finite regression goal works; `R` resets the player and creates a fresh tower |
 | M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
 | M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
 | M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removes each submerged chunk and deletes a stage root once it becomes empty |
-| M4.10 | Add a round transition landing and rotating stage material palettes | 1.5 h | Done | A compact round landing starts each streamed stage; stone, ember, and ice palettes cycle without blocking the shaft |
+| M4.10 | Add a round transition landing and rotating stage material palettes | 1.5 h | Done | The landing has a flat mesh collider and a validated gap from both neighbours; stage palettes cycle without blocking the shaft |
 | M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; the stage HUD and speed increase follow visible transitions |
 
 **Milestone exit:** at least four chunks assemble deterministically, required

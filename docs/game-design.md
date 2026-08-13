@@ -119,13 +119,15 @@ Generation rules:
    against the previous chunk's outgoing direction.
 6. Protect each accepted jump/grapple traversal corridor and reject future
    solid colliders that enter it, even when the chunk bounds do not overlap.
-7. Build an initial playable window when the run starts, then append validated
+7. Synchronize moved colliders before validation and protect the final landing
+   approach of the immediately previous chunk from raised platform walls.
+8. Build an initial playable window when the run starts, then append validated
    chunks before the player approaches the current top.
-8. Keep approximately 100 metres of generated route visible above the player.
-9. Remove chunks only after they are below the flood and can no longer be
+9. Keep approximately 100 metres of generated route visible above the player.
+10. Remove chunks only after they are below the flood and can no longer be
    recovered onto.
-10. Use one numeric run seed for reproducibility and diagnostics.
-11. Keep the authored course active if initial generation cannot complete safely.
+11. Use one numeric run seed for reproducibility and diagnostics.
+12. Keep the authored course active if initial generation cannot complete safely.
 
 The current implementation starts with one validated 24-chunk stage and streams
 another complete stage before the player approaches the generated top. Each
@@ -140,6 +142,8 @@ are then removed.
   of climbing; the exact height varies with the selected chunks.
 - A slightly oversized round landing platform clearly separates stages and
   provides a short pacing reset without spanning or blocking the tower shaft.
+  It uses a flat mesh collider and is placed beyond, rather than inside, the
+  preceding platform.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly

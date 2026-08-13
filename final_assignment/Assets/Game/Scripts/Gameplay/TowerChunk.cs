@@ -248,6 +248,37 @@ namespace SkyhookAscent.Gameplay
             return false;
         }
 
+        public TraversalClearanceSegment GetWorldExitApproachClearance()
+        {
+            Vector3 direction = GetWorldExitApproachDirection();
+            Vector3 standingOffset = Vector3.up * 1.1f;
+            Vector3 start = exit.position - direction * 5f + standingOffset;
+            Vector3 end = exit.position - direction * 0.75f + standingOffset;
+            return new TraversalClearanceSegment(start, end, 0.6f);
+        }
+
+        public bool BlocksClearance(TraversalClearanceSegment clearance)
+        {
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                Collider candidate = colliders[i];
+                if (candidate == null || !candidate.enabled || candidate.isTrigger)
+                {
+                    continue;
+                }
+
+                if (ChunkPlacementRules.BoundsBlockSegment(
+                    candidate.bounds,
+                    clearance))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void AppendClearanceSegment(
             List<TraversalClearanceSegment> output,
             Vector3 source,
@@ -284,6 +315,77 @@ namespace SkyhookAscent.Gameplay
             return fallback.sqrMagnitude >= 0.0001f
                 ? fallback.normalized
                 : Vector3.forward;
+        }
+
+        private Vector3 GetWorldExitApproachDirection()
+        {
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            Collider finalSurface = null;
+            float finalDistance = float.PositiveInfinity;
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                Collider candidate = colliders[i];
+                if (!IsTraversalSurface(candidate))
+                {
+                    continue;
+                }
+
+                float distance = candidate.bounds.SqrDistance(exit.position);
+                if (distance < finalDistance)
+                {
+                    finalSurface = candidate;
+                    finalDistance = distance;
+                }
+            }
+
+            if (finalSurface == null)
+            {
+                return WorldExitDirection;
+            }
+
+            Vector3 finalCenter = SurfaceCenter(finalSurface.bounds);
+            Collider previousSurface = null;
+            float previousDistance = float.PositiveInfinity;
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                Collider candidate = colliders[i];
+                if (candidate == finalSurface || !IsTraversalSurface(candidate))
+                {
+                    continue;
+                }
+
+                Vector3 candidateCenter = SurfaceCenter(candidate.bounds);
+                float distance = Vector3.SqrMagnitude(finalCenter - candidateCenter);
+                if (distance < previousDistance)
+                {
+                    previousSurface = candidate;
+                    previousDistance = distance;
+                }
+            }
+
+            if (previousSurface == null)
+            {
+                return WorldExitDirection;
+            }
+
+            Vector3 approach = finalCenter - SurfaceCenter(previousSurface.bounds);
+            approach.y = 0f;
+            return approach.sqrMagnitude >= 0.01f
+                ? approach.normalized
+                : WorldExitDirection;
+        }
+
+        private static bool IsTraversalSurface(Collider candidate)
+        {
+            return candidate != null &&
+                candidate.enabled &&
+                !candidate.isTrigger &&
+                candidate.GetComponentInParent<GrappleAnchor>() == null;
+        }
+
+        private static Vector3 SurfaceCenter(Bounds bounds)
+        {
+            return new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
         }
 
         private static Vector3 Abs(Vector3 value)

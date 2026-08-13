@@ -382,7 +382,7 @@ namespace SkyhookAscent.Gameplay
                         currentPrevious,
                         stageRoot,
                         forceIdentityRotation: includeStartChunk,
-                        allowDirectionReset: !includeStartChunk);
+                        requirePreviousSeparation: !includeStartChunk);
                 }
                 else
                 {
@@ -572,24 +572,34 @@ namespace SkyhookAscent.Gameplay
             TowerChunk previousChunk,
             Transform outputRoot,
             bool forceIdentityRotation,
-            bool allowDirectionReset = false)
+            bool requirePreviousSeparation = false)
         {
-            int firstRotation = forceIdentityRotation ? 0 : random.Next(4);
-            int rotationCount = forceIdentityRotation ? 1 : 4;
+            int rotationSlotCount = requirePreviousSeparation ? 8 : 4;
+            int firstRotation = forceIdentityRotation
+                ? 0
+                : random.Next(rotationSlotCount);
+            int rotationCount = forceIdentityRotation ? 1 : rotationSlotCount;
 
             for (int rotationAttempt = 0; rotationAttempt < rotationCount; rotationAttempt++)
             {
-                int quarterTurns = (firstRotation + rotationAttempt) % 4;
-                Quaternion rotation = Quaternion.Euler(0f, quarterTurns * 90f, 0f);
+                int rotationSlot =
+                    (firstRotation + rotationAttempt) % rotationSlotCount;
+                float rotationStep = 360f / rotationSlotCount;
+                Quaternion rotation = Quaternion.Euler(
+                    0f,
+                    rotationSlot * rotationStep,
+                    0f);
                 TowerChunk instance = Instantiate(prefab, outputRoot);
                 instance.name =
                     $"Generated_{spawnedChunks.Count:00}_{prefab.ChunkId}";
                 instance.transform.SetPositionAndRotation(Vector3.zero, rotation);
                 Vector3 entryOffset = instance.Entry.position - instance.transform.position;
                 instance.transform.position = attachmentPoint - entryOffset;
+                Physics.SyncTransforms();
 
                 Bounds bounds = instance.GetWorldBounds();
-                bool directionAllowed = allowDirectionReset || previousChunk == null ||
+                bool directionAllowed = requirePreviousSeparation ||
+                    previousChunk == null ||
                     ChunkPlacementRules.IsTurnAllowed(
                         previousChunk.WorldExitDirection,
                         instance.WorldEntryDirection,
@@ -601,15 +611,26 @@ namespace SkyhookAscent.Gameplay
                     continue;
                 }
 
-                if (instance.BlocksAnyClearance(protectedClearances))
+                if (previousChunk != null &&
+                    instance.BlocksClearance(
+                        previousChunk.GetWorldExitApproachClearance()))
                 {
                     clearanceRejections++;
                     DeactivateAndDestroy(instance.gameObject);
                     continue;
                 }
 
-                bool isTransitionNeighbour = previousChunk != null &&
-                    previousChunk.ChunkId == "stage-transition";
+                if (!requirePreviousSeparation &&
+                    instance.BlocksAnyClearance(protectedClearances))
+                {
+                    clearanceRejections++;
+                    DeactivateAndDestroy(instance.gameObject);
+                    continue;
+                }
+
+                bool isTransitionNeighbour = requirePreviousSeparation ||
+                    (previousChunk != null &&
+                        previousChunk.ChunkId == "stage-transition");
                 bool overlapsTransitionNeighbour = isTransitionNeighbour &&
                     OverlapsSolidGeometry(instance, previousChunk);
                 if (IsInsideTower(instance.Exit.position, bounds) &&

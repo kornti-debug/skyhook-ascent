@@ -114,7 +114,9 @@ forward and quarter-turn progress but rejects reverse turns over 100 degrees.
 Future chunk colliders are also sampled against all protected traversal
 corridors already placed. This separates physical overlap from functional route
 clearance: two chunks may not intersect yet still be rejected if one blocks an
-earlier jump or grapple approach.
+earlier jump or grapple approach. Physics transforms are synchronized before
+those tests, and an additional inferred final-landing corridor prevents the next
+chunk from forming a wall across the preceding chunk's last jump.
 
 These are seams, not a requirement to create every file immediately. Begin with
 `PlayerController`, `GrappleController`, and one handcrafted test scene.
