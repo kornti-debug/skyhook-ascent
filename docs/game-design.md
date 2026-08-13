@@ -143,7 +143,8 @@ are then removed.
 - A slightly oversized round landing platform clearly separates stages and
   provides a short pacing reset without spanning or blocking the tower shaft.
   It uses a flat mesh collider and is placed beyond, rather than inside, the
-  preceding platform.
+  preceding platform. Its top is 1.25 metres above the preceding exit, making
+  the boundary an ordinary upward jump rather than a same-height obstruction.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly

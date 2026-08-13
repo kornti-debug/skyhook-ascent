@@ -35,6 +35,8 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(5f)] private float generationAheadDistance = 35f;
         [SerializeField, Min(0f)] private float cleanupBelowWaterMargin = 2f;
         [SerializeField, Min(0.1f)] private float appendRetryDelay = 1f;
+        [SerializeField, Min(0f)] private float minimumTransitionRise = 1f;
+        [SerializeField, Min(0f)] private float maximumTransitionRise = 1.5f;
 
         [Header("Placement")]
         [SerializeField, Min(5f)] private float maximumHorizontalRadius = 12f;
@@ -598,6 +600,16 @@ namespace SkyhookAscent.Gameplay
                 Physics.SyncTransforms();
 
                 Bounds bounds = instance.GetWorldBounds();
+                float transitionRise = bounds.max.y - attachmentPoint.y;
+                bool transitionRiseAllowed = !requirePreviousSeparation ||
+                    (transitionRise >= minimumTransitionRise &&
+                        transitionRise <= maximumTransitionRise);
+                if (!transitionRiseAllowed)
+                {
+                    DeactivateAndDestroy(instance.gameObject);
+                    continue;
+                }
+
                 bool directionAllowed = requirePreviousSeparation ||
                     previousChunk == null ||
                     ChunkPlacementRules.IsTurnAllowed(
@@ -988,6 +1000,10 @@ namespace SkyhookAscent.Gameplay
             generationAheadDistance = Mathf.Max(5f, generationAheadDistance);
             cleanupBelowWaterMargin = Mathf.Max(0f, cleanupBelowWaterMargin);
             appendRetryDelay = Mathf.Max(0.1f, appendRetryDelay);
+            minimumTransitionRise = Mathf.Max(0f, minimumTransitionRise);
+            maximumTransitionRise = Mathf.Max(
+                minimumTransitionRise,
+                maximumTransitionRise);
             maximumHorizontalRadius = Mathf.Max(5f, maximumHorizontalRadius);
             maximumTurnAngle = Mathf.Clamp(maximumTurnAngle, 45f, 135f);
             overlapPadding = Mathf.Max(0f, overlapPadding);
