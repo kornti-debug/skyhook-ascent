@@ -16,7 +16,7 @@ namespace SkyhookAscent.Gameplay
         [Header("Orbit")]
         [SerializeField] private Vector3 targetOffset = new Vector3(0f, 0.9f, 0f);
         [SerializeField, Min(0f)] private float distance = 4.5f;
-        [SerializeField] private Vector2 shoulderOffset = new Vector2(0f, 0.55f);
+        [SerializeField] private Vector2 shoulderOffset = new Vector2(0f, 0.2f);
         [SerializeField, Range(-89f, 89f)]
         [Tooltip("Prevents the camera from orbiting under the player while aiming upward.")]
         private float minimumOrbitPitch;

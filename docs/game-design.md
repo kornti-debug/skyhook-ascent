@@ -66,6 +66,7 @@ The first prototype may use a capsule and primitives. Character animation is not
 
 - Fired as a visible projectile from the player/camera aim direction
 - Projectile is affected by gravity, so distant anchors require aiming above them
+- No target snapping or ballistic compensation; objects under the crosshair do not alter the launch
 - Only objects on the grapple-anchor layer can be attached
 - A missed hook returns or reloads quickly
 - One active grapple at a time

@@ -17,13 +17,11 @@ namespace SkyhookAscent.Gameplay
         [Header("Launch")]
         [SerializeField, Min(0.1f)] private float launchSpeed = 18f;
         [SerializeField] private float horizontalSpawnOffset;
-        [SerializeField] private float verticalSpawnOffset = 0.65f;
+        [SerializeField] private float verticalSpawnOffset = 1.25f;
         [SerializeField, Min(0f)] private float forwardSpawnOffset = 0.8f;
 
         [Header("Aim")]
-        [SerializeField, Min(1f)] private float aimDistance = 50f;
-        [SerializeField, Min(0.05f)] private float minimumFlightTime = 0.2f;
-        [SerializeField, Min(0.05f)] private float maximumFlightTime = 1.5f;
+        [SerializeField, Min(1f)] private float zeroingDistance = 25f;
 
         private InputAction grappleAction;
         private Collider[] ownerColliders;
@@ -32,8 +30,6 @@ namespace SkyhookAscent.Gameplay
         public GrappleProjectile ActiveProjectile => activeProjectile;
         public bool HasActiveProjectile => activeProjectile != null;
         public GrappleAnchor LastHitAnchor { get; private set; }
-        public Vector3 LastAimPoint { get; private set; }
-        public bool LastShotHadAimTarget { get; private set; }
 
         private void Awake()
         {
@@ -88,9 +84,10 @@ namespace SkyhookAscent.Gameplay
                 Vector3.up * verticalSpawnOffset +
                 cameraTransform.right * horizontalSpawnOffset +
                 aimRay.direction * forwardSpawnOffset;
-            Vector3 launchVelocity = ResolveLaunchVelocity(
-                aimRay,
-                launchPosition);
+            Vector3 aimPoint = aimRay.GetPoint(zeroingDistance);
+            Vector3 launchDirection =
+                (aimPoint - launchPosition).normalized;
+            Vector3 launchVelocity = launchDirection * launchSpeed;
 
             activeProjectile = Instantiate(
                 projectilePrefab,
@@ -100,41 +97,6 @@ namespace SkyhookAscent.Gameplay
                 launchVelocity,
                 this,
                 ownerColliders);
-        }
-
-        private Vector3 ResolveLaunchVelocity(Ray aimRay, Vector3 launchPosition)
-        {
-            if (Physics.Raycast(
-                aimRay,
-                out RaycastHit hit,
-                aimDistance,
-                Physics.DefaultRaycastLayers,
-                QueryTriggerInteraction.Ignore))
-            {
-                GrappleAnchor aimedAnchor =
-                    hit.collider.GetComponentInParent<GrappleAnchor>();
-                LastAimPoint = aimedAnchor != null
-                    ? aimedAnchor.AttachmentPosition
-                    : hit.point;
-                LastShotHadAimTarget = true;
-
-                float desiredSpeed = Mathf.Max(0.01f, launchSpeed);
-                float distanceToTarget = Vector3.Distance(
-                    launchPosition,
-                    LastAimPoint);
-                float flightTime = Mathf.Clamp(
-                    distanceToTarget / desiredSpeed,
-                    minimumFlightTime,
-                    maximumFlightTime);
-
-                return
-                    (LastAimPoint - launchPosition) / flightTime -
-                    0.5f * Physics.gravity * flightTime;
-            }
-
-            LastAimPoint = aimRay.GetPoint(aimDistance);
-            LastShotHadAimTarget = false;
-            return aimRay.direction.normalized * launchSpeed;
         }
 
         public void CancelActiveProjectile()
@@ -162,11 +124,7 @@ namespace SkyhookAscent.Gameplay
         {
             launchSpeed = Mathf.Max(0.1f, launchSpeed);
             forwardSpawnOffset = Mathf.Max(0f, forwardSpawnOffset);
-            aimDistance = Mathf.Max(1f, aimDistance);
-            minimumFlightTime = Mathf.Max(0.05f, minimumFlightTime);
-            maximumFlightTime = Mathf.Max(
-                minimumFlightTime,
-                maximumFlightTime);
+            zeroingDistance = Mathf.Max(1f, zeroingDistance);
         }
     }
 }

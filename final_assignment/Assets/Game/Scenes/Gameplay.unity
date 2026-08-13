@@ -726,7 +726,7 @@ MonoBehaviour:
   target: {fileID: 705153450}
   targetOffset: {x: 0, y: 0.9, z: 0}
   distance: 4.5
-  shoulderOffset: {x: 0, y: 0.55}
+  shoulderOffset: {x: 0, y: 0.2}
   minimumOrbitPitch: 0
   initialPitch: 15
   initialYaw: 0
@@ -944,11 +944,9 @@ MonoBehaviour:
   projectilePrefab: {fileID: 530856012945902762, guid: 241988ae87c78a5409effdf133cd0736, type: 3}
   launchSpeed: 18
   horizontalSpawnOffset: 0
-  verticalSpawnOffset: 0.65
+  verticalSpawnOffset: 1.25
   forwardSpawnOffset: 0.8
-  aimDistance: 50
-  minimumFlightTime: 0.2
-  maximumFlightTime: 1.5
+  zeroingDistance: 25
 --- !u!1 &1019029343
 GameObject:
   m_ObjectHideFlags: 0
