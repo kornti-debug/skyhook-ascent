@@ -152,6 +152,17 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
+        public void ResetForNewRun()
+        {
+            movementEnabled = false;
+            zipMovementActive = false;
+            moveInput = Vector2.zero;
+            runHeld = false;
+            jumpQueuedUntil = float.NegativeInfinity;
+            lastGroundedTime = float.NegativeInfinity;
+            ignoreGroundUntil = Time.time + 0.1f;
+        }
+
         private void ApplyHorizontalMovement()
         {
             Vector3 velocity = body.linearVelocity;

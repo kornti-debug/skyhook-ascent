@@ -5,7 +5,7 @@ Working title: **Skyhook Ascent**
 
 ## Selected concept
 
-An endless third-person 3D vertical platformer inside a hollow cylindrical tower. The player outruns a rising hazard by running, jumping, and firing a gravity-affected grappling hook at marked anchors. Procedurally assembled tower sections create a different upward route for each run.
+An endless third-person 3D vertical platformer inside a hollow cylindrical tower. The player outruns an accelerating flood by running, jumping, and firing a gravity-affected grappling hook at marked anchors. A displayed run seed deterministically assembles reproducible stages ahead of the player, while submerged stages are recycled below.
 
 ## Why this concept was selected
 
@@ -20,7 +20,7 @@ An endless third-person 3D vertical platformer inside a hollow cylindrical tower
 ## Locked design decisions
 
 - Third-person 3D presentation
-- One endless upward run
+- Endless upward run assembled from a bounded window of generated chunks
 - Interior of a hollow cylindrical tower
 - Platforms distributed around the inner wall and central shaft
 - Route appears to spiral because generated chunks rotate around the vertical axis
@@ -34,6 +34,9 @@ An endless third-person 3D vertical platformer inside a hollow cylindrical tower
 - Rising water/void as the primary hazard and timer
 - Height as the primary score
 - Seeded procedural assembly from handcrafted, validated chunk prefabs
+- `R` returns to the ground and creates a fresh seed and route
+- A wide transition platform, new material palette, and faster flood mark each
+  generated stage (roughly 80-100 m with the current chunks)
 
 ## Parked alternatives
 

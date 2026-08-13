@@ -1,0 +1,20 @@
+{
+  "name": "SkyhookAscent.Tests.EditMode",
+  "rootNamespace": "SkyhookAscent.Tests",
+  "references": [
+    "SkyhookAscent.Gameplay"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

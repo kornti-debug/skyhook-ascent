@@ -87,13 +87,34 @@ GrappleController.cs       Single-hook lifecycle, rope feedback, zip pull, and r
 GrappleProjectile.cs       Ballistic flight, anchor collision, attachment, and return
 GrappleAnchor.cs           Valid target marker and presentation reference
 TowerChunk.cs              Entry, exit, bounds, difficulty, and metadata
-TowerGenerator.cs          Seeded chunk selection, placement, and cleanup
+TowerGenerator.cs          Seeded placement, streaming window, validation, cleanup, and fallback
 ChunkSelectionRules.cs     Deterministic selection rules for EditMode tests
-RisingHazard.cs            Hazard movement and player contact
+ChunkPlacementRules.cs     Turn-angle and protected-corridor geometry rules
+TowerStreamingRules.cs     Append, recycling, and deterministic stage-seed rules
+RisingHazard.cs            Stage-based hazard speed and player contact
 RunController.cs           Run state, score, death, and restart
 RunConfig.cs               Tuneable movement, grapple, hazard, and generation values
 HudController.cs           Height, warnings, seed, and run-end presentation
 ```
+
+`SkyhookAscent.Gameplay.asmdef` owns the runtime scripts. The small
+`SkyhookAscent.Tests.EditMode` assembly references it and tests only the plain
+chunk-selection and streaming rules. Thirteen prefab assets live under
+`Assets/Game/Prefabs/TowerChunks`; the authored `Course` remains a scene-owned
+fallback rather than becoming hidden generator data.
+
+`FinishGoal` owns landing detection only for the authored fallback. Generated
+play is endless. `RunController` owns loss presentation and the restart input
+bridge, while `TowerGenerator` alone owns run seeds, transactional stage
+generation, transition palettes, and below-flood stage cleanup.
+
+Every chunk serializes an incoming direction, outgoing direction, and traversal
+clearance width captured from its real prefab geometry. Placement permits
+forward and quarter-turn progress but rejects reverse turns over 100 degrees.
+Future chunk colliders are also sampled against all protected traversal
+corridors already placed. This separates physical overlap from functional route
+clearance: two chunks may not intersect yet still be rejected if one blocks an
+earlier jump or grapple approach.
 
 These are seams, not a requirement to create every file immediately. Begin with
 `PlayerController`, `GrappleController`, and one handcrafted test scene.

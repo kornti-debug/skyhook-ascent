@@ -60,6 +60,10 @@ If this gate slips by more than two hours, simplify the hook before adding proce
 - Chunks align and do not visibly overlap
 - Required routes work with base abilities
 - Authored fallback remains available
+- A 24-chunk generated window is valid and playable before streaming is enabled
+- Endless generation appends ahead of the player and removes only chunks below
+  the flood
+- Each roughly 80-100 m transition introduces a readable visual stage and faster flood
 
 ### Gate 6: submission candidate - hour 34
 
@@ -87,8 +91,10 @@ The referenceable task breakdown and status live in
 3. Prove one satisfying grapple sequence.
 4. Complete an authored start-climb-fail-restart run.
 5. Add deterministic procedural chunks without removing the authored fallback.
-6. Improve readability and aesthetics.
-7. Freeze features, build, test, and record.
+6. Convert the proven finite generator into a bounded endless streaming window.
+7. Add stage transitions and height-based material palettes.
+8. Improve readability and aesthetics.
+9. Freeze features, build, test, and record.
 
 ## Work log
 
@@ -98,7 +104,7 @@ The referenceable task breakdown and status live in
 
 ## Scope-cut order
 
-1. Upgrade system
+1. Upgrade/roguelike system
 2. Collectibles
 3. Persistent high score
 4. Audio

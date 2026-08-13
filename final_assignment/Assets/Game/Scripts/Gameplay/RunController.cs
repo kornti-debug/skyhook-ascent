@@ -17,12 +17,12 @@ namespace SkyhookAscent.Gameplay
 
         [Header("Run")]
         [SerializeField, Min(0f)] private float hazardContactMargin = 0.85f;
-        [SerializeField, Min(0f)] private float finishDistance = 3f;
         [SerializeField] private int displayedSeed = 104729;
 
         private InputAction restartAction;
         private PlayerController playerController;
         private GrappleController grappleController;
+        private TowerGenerator towerGenerator;
         private CrosshairPresenter crosshair;
         private Vector3 playerStartPosition;
         private Quaternion playerStartRotation;
@@ -34,6 +34,12 @@ namespace SkyhookAscent.Gameplay
         public bool RunEnded => runEnded;
         public float CurrentHeight => runHeight;
         public float BestHeight => bestHeight;
+
+        public void ConfigureCourse(Transform courseFinish, int seed)
+        {
+            finish = courseFinish;
+            displayedSeed = seed;
+        }
 
         private void Awake()
         {
@@ -59,6 +65,8 @@ namespace SkyhookAscent.Gameplay
                     finish = finishObject.transform;
                 }
             }
+
+            towerGenerator = FindFirstObjectByType<TowerGenerator>();
 
             if (player != null)
             {
@@ -102,7 +110,7 @@ namespace SkyhookAscent.Gameplay
         {
             if (restartAction != null && restartAction.WasPressedThisFrame())
             {
-                StartRun();
+                StartNewRun();
                 return;
             }
 
@@ -115,19 +123,48 @@ namespace SkyhookAscent.Gameplay
                 runHeight,
                 player.position.y - playerStartPosition.y);
             bestHeight = Mathf.Max(bestHeight, runHeight);
-            hazard.ReportPlayerHeight(runHeight);
+
+            if (towerGenerator != null && towerGenerator.EndlessMode)
+            {
+                hazard.ReportPlayerProgress(
+                    runHeight,
+                    towerGenerator.GetStageIndexAtHeight(player.position.y),
+                    towerGenerator.GetStageProgressAtHeight(player.position.y));
+            }
+            else
+            {
+                hazard.ReportPlayerHeight(runHeight);
+            }
 
             if (player.position.y <= hazard.SurfaceHeight + hazardContactMargin)
             {
-                EndRun("THE FLOOD CAUGHT YOU");
+                EndRun("THE FLOOD CAUGHT YOU", freezePlayer: false);
+            }
+        }
+
+        public void CompleteRun()
+        {
+            if (!runEnded)
+            {
+                EndRun("TOWER CLEARED", freezePlayer: true);
+            }
+        }
+
+        public void StartNewRun()
+        {
+            grappleController?.ResetForNewRun();
+            playerController?.ResetForNewRun();
+
+            if (towerGenerator == null || !towerGenerator.GenerateNextCourse())
+            {
+                Debug.LogWarning(
+                    "New run request was cancelled because no valid replacement course was generated.",
+                    this);
+                StartRun();
                 return;
             }
 
-            if (finish != null &&
-                Vector3.Distance(player.position, finish.position) <= finishDistance)
-            {
-                EndRun("TOWER CLEARED");
-            }
+            StartRun();
         }
 
         public void StartRun()
@@ -145,15 +182,18 @@ namespace SkyhookAscent.Gameplay
                 Rigidbody playerBody = player.GetComponent<Rigidbody>();
                 if (playerBody != null)
                 {
+                    playerBody.position = playerStartPosition;
+                    playerBody.rotation = playerStartRotation;
                     playerBody.linearVelocity = Vector3.zero;
                     playerBody.angularVelocity = Vector3.zero;
                     playerBody.useGravity = true;
                 }
             }
 
-            playerController?.SetZipMovementActive(false);
+            Physics.SyncTransforms();
+            playerController?.ResetForNewRun();
             playerController?.SetMovementEnabled(true);
-            grappleController?.SetGrappleEnabled(true);
+            grappleController?.ResetForNewRun();
 
             if (crosshair != null)
             {
@@ -167,7 +207,7 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
-        private void EndRun(string title)
+        private void EndRun(string title, bool freezePlayer)
         {
             runEnded = true;
             resultTitle = title;
@@ -175,6 +215,17 @@ namespace SkyhookAscent.Gameplay
             hazard.Stop();
             playerController?.SetMovementEnabled(false);
             grappleController?.SetGrappleEnabled(false);
+
+            if (freezePlayer && player != null)
+            {
+                Rigidbody playerBody = player.GetComponent<Rigidbody>();
+                if (playerBody != null)
+                {
+                    playerBody.linearVelocity = Vector3.zero;
+                    playerBody.angularVelocity = Vector3.zero;
+                    playerBody.useGravity = false;
+                }
+            }
 
             if (crosshair != null)
             {
@@ -192,13 +243,15 @@ namespace SkyhookAscent.Gameplay
                 normal = { textColor = Color.white }
             };
 
-            GUI.Box(new Rect(20f, 20f, 280f * scale, 112f * scale), string.Empty);
-            GUI.Label(new Rect(36f, 30f, 250f * scale, 30f * scale),
+            GUI.Box(new Rect(20f, 20f, 370f * scale, 144f * scale), string.Empty);
+            GUI.Label(new Rect(36f, 30f, 330f * scale, 30f * scale),
                 $"HEIGHT  {runHeight:0.0} m", labelStyle);
-            GUI.Label(new Rect(36f, 62f, 250f * scale, 30f * scale),
+            GUI.Label(new Rect(36f, 62f, 330f * scale, 30f * scale),
                 $"BEST      {bestHeight:0.0} m", labelStyle);
-            GUI.Label(new Rect(36f, 94f, 250f * scale, 30f * scale),
-                $"SEED      {displayedSeed}", labelStyle);
+            GUI.Label(new Rect(36f, 94f, 330f * scale, 30f * scale),
+                $"SEED  {displayedSeed}", labelStyle);
+            GUI.Label(new Rect(36f, 126f, 330f * scale, 30f * scale),
+                $"STAGE  {(hazard != null ? hazard.CurrentStage + 1 : 1)}", labelStyle);
 
             if (!runEnded)
             {
@@ -229,13 +282,12 @@ namespace SkyhookAscent.Gameplay
             GUI.Label(new Rect(panel.x, panel.y + 88f * scale, panel.width, 40f * scale),
                 $"Height: {runHeight:0.0} m    Best: {bestHeight:0.0} m", centerStyle);
             GUI.Label(new Rect(panel.x, panel.y + 144f * scale, panel.width, 45f * scale),
-                "Press R to restart", centerStyle);
+                "R  New Tower", centerStyle);
         }
 
         private void OnValidate()
         {
             hazardContactMargin = Mathf.Max(0f, hazardContactMargin);
-            finishDistance = Mathf.Max(0f, finishDistance);
         }
     }
 }

@@ -87,7 +87,7 @@ Goal: a short non-procedural course with the full start-climb-fail-restart loop.
 | M3.2 | Add the rising hazard and player contact/death | 0.75 h | Done | The hazard applies pressure and ends the run reliably |
 | M3.3 | Add run state, height score, session best, seed display, finish, and restart | 1.25 h | Done | One button cleanly resets player, hazard, score, and course state |
 | M3.4 | Add minimal HUD and run-end panel | 0.5 h | Done | Gameplay and failure state are understandable without explanation |
-| M3.5 | Play-test and balance the authored run | 0.75 h | Next | Full loop works repeatedly before procedural work begins |
+| M3.5 | Play-test and balance the authored run | 0.75 h | Done | Full loop works repeatedly before procedural work begins |
 
 **Milestone exit:** this is the safe fallback submission version. Procedural
 generation must never be allowed to break this working loop.
@@ -99,13 +99,17 @@ reproducible, testable, and explainable.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M4.1 | Define `TowerChunk` entry, exit, bounds, difficulty, weight, and traversal metadata | 0.5 h | Planned | Metadata is visible and understandable in the Inspector |
-| M4.2 | Convert four validated authored sections into chunk prefabs | 1.25 h | Planned | Every chunk is completable with base movement/grapple values |
-| M4.3 | Implement plain-C# seeded chunk-selection rules | 1.0 h | Planned | Same seed gives the same sequence; focused EditMode tests pass |
-| M4.4 | Align and rotate chunk prefabs from exit to entry | 1.0 h | Planned | A fixed seed builds a continuous ascending route |
-| M4.5 | Add overlap rejection, recent-history limits, and diagnostic rejection reasons | 1.0 h | Planned | Bad candidates are rejected visibly without hiding the reason |
-| M4.6 | Stream chunks above the player and remove chunks below the hazard | 0.75 h | Planned | A run continues without manual scene changes or unbounded growth |
-| M4.7 | Preserve the authored fallback and verify at least three fixed seeds | 0.5 h | Planned | Each chosen seed remains playable and reproducible |
+| M4.1 | Define `TowerChunk` entry, exit, bounds, difficulty, weight, and traversal metadata | 0.5 h | Done | Metadata is visible and understandable in the Inspector |
+| M4.2 | Convert four validated sections and create eight derived variants | 1.25 h | Done | Twelve prefab shapes provide jump, zip, mixed, precision, mirrored, and recovery rhythms |
+| M4.3 | Implement plain-C# seeded chunk-selection and pacing rules | 1.0 h | Done | Five focused EditMode tests pass; a category may repeat twice but not three times when alternatives exist |
+| M4.4 | Align and rotate chunk prefabs from exit to entry | 1.0 h | Done | Seed `104729` builds a connected 24-chunk route ending near 97 m |
+| M4.5 | Add overlap, reverse-turn, protected-corridor, history, and fallback validation | 1.0 h | Done | Seed `104729` rejects backward/blocking rotations; a 24-chunk audit reports zero direction or corridor violations |
+| M4.6 | Add landing-based finish, generated-run restart, and longer hazard progression | 0.75 h | Done | The finite regression goal works; `R` resets the player and creates a fresh tower |
+| M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
+| M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
+| M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removed only whole stages below the flood and retained two or more active stages |
+| M4.10 | Add a wide transition chunk and rotating stage material palettes | 1.5 h | Done | A broad ring with a central opening starts each streamed stage; stone, ember, and ice palettes cycle |
+| M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; the stage HUD and speed increase follow visible transitions |
 
 **Milestone exit:** at least four chunks assemble deterministically, required
 routes work with base abilities, and generated chunks do not visibly overlap.
@@ -148,13 +152,15 @@ Attempt only after M6.1-M6.4 pass:
 1. Crumbling platform
 2. Persistent high score
 3. Safe/risky branch inside selected chunks
-4. Two-choice temporary upgrade
+4. Two-choice temporary upgrade/roguelike choice
 5. Optional collectible
 
 No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Play-test **M3.5**: complete the authored course, deliberately let the flood
-catch the player, and restart both outcomes. Tune the flood only after the
-movement, grapple, win, loss, and restart loop all behave consistently.
+Manually traverse at least two full generated stages from the start. Confirm the
+transition ring is readable and passable, the palette and HUD stage change at
+the same boundary, the flood becomes faster, and streaming is not visible as a
+pause. Also press `R` while airborne and during an active grapple to confirm the
+player always returns to the start. After that, begin **M5.1** visual polish.

@@ -191,6 +191,13 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
+        public void ResetForNewRun()
+        {
+            grappleEnabled = true;
+            LastHitAnchor = null;
+            ResetGrapple(true);
+        }
+
         internal void HandleProjectileAttached(
             GrappleProjectile projectile,
             GrappleAnchor hitAnchor)

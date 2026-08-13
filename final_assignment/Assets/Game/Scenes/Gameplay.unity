@@ -412,6 +412,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1493260514}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &282586696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 282586698}
+  - component: {fileID: 282586697}
+  m_Layer: 0
+  m_Name: ProceduralTower
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &282586697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282586696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 976dd612239b7954a946c458e59a8ab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkyhookAscent.Gameplay::SkyhookAscent.Gameplay.TowerGenerator
+  authoredFallback: {fileID: 334231173}
+  generatedRoot: {fileID: 417802933}
+  startChunkPrefab: {fileID: 7032299948117649000, guid: 5898f1c5c3c323446a22aa21e2533345, type: 3}
+  transitionChunkPrefab: {fileID: 2555402279965069556, guid: 2f874eb26b22ffd478b67948817864ec, type: 3}
+  chunkPrefabs:
+  - {fileID: 9037264538576531572, guid: dc5f95670f7eeff42b2fe3cf4a0bc583, type: 3}
+  - {fileID: 3530929686377047474, guid: f7fb73d56a90bcf419907f156969d065, type: 3}
+  - {fileID: 4686570845909283294, guid: 26f9143089744c94684ceeb23cc4964f, type: 3}
+  - {fileID: 2914987882528748917, guid: c851421946ab2cd4c9b9f672d064938a, type: 3}
+  - {fileID: 746237531286266121, guid: 5b67aa7f5f0fc034aa3b8eb00a0538ee, type: 3}
+  - {fileID: 6351746683868060630, guid: 3a9ce3521a8cfb144a30a5d64e82f330, type: 3}
+  - {fileID: 8966340988723377612, guid: e202e584211645649b01f744a589199a, type: 3}
+  - {fileID: 8469544898694220575, guid: f5e30b2688bf09c418cd50d32ac34bea, type: 3}
+  - {fileID: 1221386026701309219, guid: c0cbcf7cfac60144dbb2e8be404f7abf, type: 3}
+  - {fileID: 8965682857835161000, guid: 89d47ade4bfc48043b0c1a79413ce986, type: 3}
+  - {fileID: 6972448983460348392, guid: f05aaddd71e1f324197c0a0418c163cf, type: 3}
+  stageMaterials:
+  - {fileID: 2100000, guid: 5db1ee655b9b097478f857c0538ba46e, type: 2}
+  - {fileID: 2100000, guid: 919f066790bafee40a9f85ee9605ffc2, type: 2}
+  - {fileID: 2100000, guid: 0c115e4adf6f02d4e8fc738fb3bf66c1, type: 2}
+  finishGoal: {fileID: 726360983}
+  runController: {fileID: 1267383180}
+  player: {fileID: 705153450}
+  hazard: {fileID: 1354439701}
+  seed: 104729
+  generatedChunkCount: 24
+  recentHistoryLength: 2
+  maximumSeedAttempts: 32
+  randomizeInitialSeed: 1
+  endlessMode: 1
+  generationAheadDistance: 35
+  cleanupBelowWaterMargin: 2
+  appendRetryDelay: 1
+  maximumHorizontalRadius: 12
+  maximumTurnAngle: 100
+  overlapPadding: 0.1
+  maximumPlacementAttempts: 24
+  generateOnAwake: 1
+--- !u!4 &282586698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282586696}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 417802933}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &285218199
 GameObject:
   m_ObjectHideFlags: 0
@@ -655,7 +738,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6181810d9d4a9c439ee65bd589892da, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.GrappleAnchor
   attachmentPoint: {fileID: 0}
 --- !u!23 &395341542
@@ -751,6 +834,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 285218200}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &417802932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 417802933}
+  m_Layer: 0
+  m_Name: GeneratedChunks
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &417802933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 417802932}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 282586698}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &423110777
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +910,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6181810d9d4a9c439ee65bd589892da, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.GrappleAnchor
   attachmentPoint: {fileID: 0}
 --- !u!23 &423110780
@@ -981,7 +1095,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d537423d02bf7c04ea182723f621e020, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.ThirdPersonCameraController
   inputActions: {fileID: -944628639613478452, guid: 9f52311032cf5824b8e16985e0b3a3c8, type: 3}
   target: {fileID: 705153450}
@@ -1014,7 +1128,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c3a6cd2dd40e244c8ff470c00d3bc5d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.CrosshairPresenter
   color: {r: 1, g: 0.45, b: 0.05, a: 1}
   lineLength: 10
@@ -1468,7 +1582,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 890dbbbf683c7e1458711a77546ba39b, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.PlayerController
   inputActions: {fileID: -944628639613478452, guid: 9f52311032cf5824b8e16985e0b3a3c8, type: 3}
   movementReference: {fileID: 488392326}
@@ -1520,7 +1634,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f1b5a72b0304d44a8e84a227cdddde0, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.GrappleController
   inputActions: {fileID: -944628639613478452, guid: 9f52311032cf5824b8e16985e0b3a3c8, type: 3}
   aimCamera: {fileID: 488392325}
@@ -1550,6 +1664,8 @@ GameObject:
   - component: {fileID: 726360983}
   - component: {fileID: 726360985}
   - component: {fileID: 726360984}
+  - component: {fileID: 726360987}
+  - component: {fileID: 726360986}
   m_Layer: 0
   m_Name: FinishGoal
   m_TagString: Untagged
@@ -1566,8 +1682,8 @@ Transform:
   m_GameObject: {fileID: 726360982}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: 17, z: 7}
-  m_LocalScale: {x: 2.2, y: 0.15, z: 2.2}
+  m_LocalPosition: {x: 1, y: 16.2, z: 7}
+  m_LocalScale: {x: 2.8, y: 0.2, z: 2.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1493260514}
@@ -1628,6 +1744,41 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726360982}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &726360986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726360982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7915d04f9021b4aa376e440fece34d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkyhookAscent.Gameplay::SkyhookAscent.Gameplay.FinishGoal
+  runController: {fileID: 1267383180}
+--- !u!64 &726360987
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726360982}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &957780899
 GameObject:
@@ -1911,14 +2062,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b303ae4537dd4c4b8a2fe58ffcd65a5, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.RunController
   inputActions: {fileID: -944628639613478452, guid: 9f52311032cf5824b8e16985e0b3a3c8, type: 3}
   player: {fileID: 0}
   hazard: {fileID: 0}
   finish: {fileID: 0}
   hazardContactMargin: 0.85
-  finishDistance: 3
   displayedSeed: 104729
 --- !u!4 &1267383181
 Transform:
@@ -1979,11 +2129,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ef66f3acddef704fab23e3eb8bb7052, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.RisingHazard
   riseSpeed: 0.45
-  maximumAdditionalSpeed: 0.45
-  accelerationHeight: 16
+  maximumAdditionalSpeed: 1.4
+  stageHeight: 100
+  stageSpeedIncrease: 0.14
+  withinStageSpeedIncrease: 0.08
 --- !u!23 &1354439702
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2677,3 +2829,4 @@ SceneRoots:
   - {fileID: 334231174}
   - {fileID: 705153450}
   - {fileID: 1267383181}
+  - {fileID: 282586698}

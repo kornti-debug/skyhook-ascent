@@ -5,13 +5,13 @@ Working title: **Skyhook Ascent**
 
 ## One-sentence pitch
 
-An endless 3D vertical platformer where the player outruns a rising flood by jumping through a procedurally assembled tower and landing gravity-affected hook shots that zip them upward.
+An endless 3D vertical platformer where the player outruns an accelerating flood by jumping through a seeded procedural tower and landing gravity-affected hook shots that zip them upward for a high score.
 
 ## Player experience
 
 The player should understand "go up before the water reaches you" within 15 seconds. Running, jumping, landing a ballistic hook shot, and being pulled to the next platform should feel responsive enough that failure feels caused by a readable decision or execution mistake.
 
-A typical early run should last 2-5 minutes. Better players can continue until the increasing difficulty and hazard speed overwhelm them.
+A typical run should last several minutes and end when the accelerating flood catches the player. Skilled players climb farther by moving cleanly and taking difficult grapple shortcuts.
 
 ## Design pillars
 
@@ -44,10 +44,11 @@ Mandatory grapple chunks ensure the main mechanic cannot be ignored.
 2. Climb through generated tower chunks.
 3. Choose safe or risky routes when offered.
 4. The hazard rises and gradually accelerates.
-5. New chunks generate above the player.
-6. Chunks below the hazard are removed or recycled.
+5. Generate more chunks ahead as the player climbs.
+6. Recycle chunks that are safely below the flood.
 7. Contact with the hazard ends the run.
-8. Show maximum height and restart with a new or repeated seed.
+8. Show maximum height; `R` returns the player to the ground and starts a fresh
+   tower with a new displayed seed.
 
 ## Player mechanics
 
@@ -109,12 +110,41 @@ Each chunk provides:
 Generation rules:
 
 1. Choose a chunk compatible with the current difficulty and recent history.
+   The exact prefab cannot repeat inside the recent-history window; traversal
+   categories may repeat twice but not three times while alternatives exist.
 2. Align its entry with the previous chunk's exit.
 3. Rotate it around the tower axis.
 4. Reject overlapping placements.
-5. Keep several chunks generated above the player.
-6. Remove or pool chunks below the hazard.
-7. Use a numeric seed for reproducibility.
+5. Reject a candidate whose incoming direction turns more than 100 degrees
+   against the previous chunk's outgoing direction.
+6. Protect each accepted jump/grapple traversal corridor and reject future
+   solid colliders that enter it, even when the chunk bounds do not overlap.
+7. Build an initial playable window when the run starts, then append validated
+   chunks before the player approaches the current top.
+8. Keep approximately 100 metres of generated route visible above the player.
+9. Remove chunks only after they are below the flood and can no longer be
+   recovered onto.
+10. Use one numeric run seed for reproducibility and diagnostics.
+11. Keep the authored course active if initial generation cannot complete safely.
+
+The current implementation starts with one validated 24-chunk stage and streams
+another complete stage before the player approaches the generated top. Each
+stage is built transactionally from the displayed run seed: an invalid candidate
+is discarded without disturbing the playable tower. Whole stages are recycled
+only after their highest point is below the flood, while at least two stages
+remain active.
+
+### Height stages
+
+- Each generated section begins a new visual stage after roughly 80-100 metres
+  of climbing; the exact height varies with the selected chunks.
+- A wide transition platform clearly separates stages and provides a short
+  pacing reset. It may contain a central opening when that route is validated.
+- Platforms receive the material palette of their height stage, such as stone,
+  wood, ice, or overgrown masonry.
+- The flood speed increases at each stage boundary and may also rise smoothly
+  within a stage.
+- Stage geometry and materials must not change the reachability rules.
 
 Every chunk must be tested with base movement and grapple values. Upgrades may make routes easier or unlock optional shortcuts, but required progression never depends on an upgrade.
 
@@ -125,7 +155,7 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 3. Mandatory grapple across the shaft
 4. Safe jumps versus grapple shortcut
 5. Recovery/rest section
-6. Finish/debug section used before endless streaming is enabled
+6. Wide transition ring between generated stages
 
 ### Authored chunk prototype
 
@@ -139,9 +169,13 @@ manually arranged clockwise spiral made from four named chunk groups:
 4. `Chunk_03_MixedRecovery`: a second zip landing followed by a normal jump and
    a wider recovery/exit platform.
 
-Each group has an `Entry` and `Exit` transform showing how chunks will connect.
-The scene objects remain authored prototypes until every transition is
-play-tested. Only validated groups become reusable chunk prefabs.
+Each group has an `Entry` and `Exit` transform showing how chunks connect. The
+four validated groups are preserved in the scene as the fallback and converted
+to reusable prefabs. Derived jump, grapple, mixed, mirrored, precision, and
+recovery variants bring the current asset set to 12 shapes: one fixed warm-up
+plus 11 reusable choices. Seed `104729` remains a useful deterministic
+regression seed. Normal play uses a fresh run seed and continues beyond the
+initial 24-chunk stage.
 
 ## Difficulty progression
 
@@ -171,11 +205,10 @@ Required run-end UI:
 - Seed
 - Restart
 
-The authored fallback course ends at a visible goal marker on the final recovery
-platform. Reaching it produces a `Tower Cleared` result; contact with the rising
-flood produces a failure result. Both states freeze movement and accept `R` to
-restart the same course. Endless continuation replaces this finish only after
-procedural streaming is proven.
+The authored fallback still contains a round goal platform for regression
+testing, but generated play is endless and has no normal finish. Flood contact
+ends the run. `R` cancels any active grapple, creates a fresh seeded tower, and
+returns the player, hazard, score, grapple, and camera state to the start.
 
 Persistent high scores are optional.
 
@@ -185,14 +218,15 @@ Persistent high scores are optional.
 - Grapple projectile visibly arcs and attaches only to valid anchors.
 - A valid hit automatically zips the player to the anchor and releases near it.
 - A miss reaches its range or an invalid surface, returns visibly, and only then restores grapple readiness.
-- One handcrafted course supports a complete start-climb-fail-restart loop.
-- The authored course has a visible finish and supports a win-restart loop.
+- One handcrafted fallback course supports a complete start-climb-fail-restart loop.
+- Generated play streams additional stages before the player reaches the top.
 - Rising hazard reliably ends the run.
 - At least four chunk prefabs assemble from a fixed seed.
 - Repeating a seed produces the same chunk sequence.
 - Every required chunk route is completable using base abilities.
 - Generated chunks do not visibly overlap.
-- The run can continue without manual scene changes.
+- Submerged stages are removed only after the flood makes recovery impossible.
+- `R` always returns the player to the start with a new displayed seed and tower.
 - Project compiles without project errors.
 
 ## Stretch features
@@ -204,6 +238,7 @@ In priority order:
 3. Two-choice temporary upgrades at safe milestones
 4. Optional collectibles on risky routes
 5. Additional visual tower theme
+6. Additional chunk variants
 
 Possible upgrades must not be required by generation:
 
@@ -244,3 +279,16 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - Camera collision inside the cylindrical tower needs early testing.
 - Generated chunk rotation can create visual intersections even when traversal remains valid.
 - Rising hazard speed must pressure the player without making safe routes pointless.
+- Structural generation is automated, but each accepted seed still needs a human traversal play-test.
+- The six derived variants reuse validated primitives, but their changed gaps
+  and rhythm require manual base-ability validation before they are considered
+  submission-safe.
+- Clearance validation uses a conservative sampled corridor rather than an
+  exact simulation of every possible ballistic aiming arc. It prevents known
+  platform obstructions but does not replace manual traversal testing.
+- Streaming and cleanup operate on complete 24-chunk stages rather than on
+  individual chunks. This is intentionally simple and may retain more objects
+  than a production pooling system.
+- The transition ring and three stage palettes are functional prototype art;
+  their final appearance and traversal feel still need a human play-test.
+- Roguelike upgrades are not implemented and remain outside the current MVP.
