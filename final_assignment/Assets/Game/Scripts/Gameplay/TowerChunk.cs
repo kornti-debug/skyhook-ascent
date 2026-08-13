@@ -195,6 +195,8 @@ namespace SkyhookAscent.Gameplay
                 return;
             }
 
+            output.Add(GetWorldExitHeadroomClearance());
+
             Vector3 source = entry.position + Vector3.up * 1.25f;
             GrappleAnchor[] anchors = GetComponentsInChildren<GrappleAnchor>(true);
             if (anchors.Length > 0)
@@ -255,6 +257,16 @@ namespace SkyhookAscent.Gameplay
             Vector3 start = exit.position - direction * 5f + standingOffset;
             Vector3 end = exit.position - direction * 0.75f + standingOffset;
             return new TraversalClearanceSegment(start, end, 0.6f);
+        }
+
+        public TraversalClearanceSegment GetWorldExitHeadroomClearance()
+        {
+            Vector3 standingCenter = exit.position + Vector3.up;
+            Vector3 jumpApexCenter = exit.position + Vector3.up * 2.9f;
+            return new TraversalClearanceSegment(
+                standingCenter,
+                jumpApexCenter,
+                0.6f);
         }
 
         public bool BlocksClearance(TraversalClearanceSegment clearance)

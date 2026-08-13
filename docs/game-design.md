@@ -145,6 +145,8 @@ are then removed.
   It uses a flat mesh collider and is placed beyond, rather than inside, the
   preceding platform. Its top is 1.25 metres above the preceding exit, making
   the boundary an ordinary upward jump rather than a same-height obstruction.
+  Its placement must also preserve player-sized landing and jump headroom above
+  the preceding platform.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly
@@ -217,6 +219,11 @@ The authored fallback still contains a round goal platform for regression
 testing, but generated play is endless and has no normal finish. Flood contact
 ends the run. `R` cancels any active grapple, creates a fresh seeded tower, and
 returns the player, hazard, score, grapple, and camera state to the start.
+
+In the Unity Editor only, `F3` toggles collision-free debug flight for streaming
+and geometry inspection. Use `WASD` to move, `Space`/`E` to rise,
+`Left Ctrl`/`Q` to descend, and `Left Shift` to boost. The component is inert in
+player builds and is not part of the normal game rules.
 
 Persistent high scores are optional.
 

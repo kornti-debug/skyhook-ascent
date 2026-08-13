@@ -122,6 +122,9 @@ uses 1.25 m so the boundary is a normal upward jump. Transitions are not exempt
 from protected traversal corridors: their landing geometry must also leave every
 preceding grapple trajectory unobstructed. Seam validation is bidirectional, so
 the previous chunk also cannot obstruct the new chunk's firing or jump corridor.
+Every chunk exit additionally protects a vertical player-sized landing and jump
+headroom volume, preventing a transition from becoming a low ceiling above the
+preceding platform.
 
 These are seams, not a requirement to create every file immediately. Begin with
 `PlayerController`, `GrappleController`, and one handcrafted test scene.

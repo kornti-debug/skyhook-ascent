@@ -132,6 +132,31 @@ namespace SkyhookAscent.Tests
         }
 
         [Test]
+        public void ExitHeadroomRejectsLowCeilingAboveLanding()
+        {
+            TraversalClearanceSegment landingHeadroom =
+                new TraversalClearanceSegment(
+                    new UnityEngine.Vector3(3f, 416.5f, 1.5f),
+                    new UnityEngine.Vector3(3f, 418.4f, 1.5f),
+                    0.6f);
+            UnityEngine.Bounds lowTransitionPlatform =
+                new UnityEngine.Bounds(
+                    new UnityEngine.Vector3(3f, 417.1f, 1.5f),
+                    new UnityEngine.Vector3(4f, 0.8f, 4f));
+            UnityEngine.Bounds clearTransitionPlatform =
+                new UnityEngine.Bounds(
+                    new UnityEngine.Vector3(3f, 417.1f, -4.5f),
+                    new UnityEngine.Vector3(4f, 0.8f, 4f));
+
+            Assert.That(ChunkPlacementRules.BoundsBlockSegment(
+                lowTransitionPlatform,
+                landingHeadroom), Is.True);
+            Assert.That(ChunkPlacementRules.BoundsBlockSegment(
+                clearTransitionPlatform,
+                landingHeadroom), Is.False);
+        }
+
+        [Test]
         public void StreamingAppendsWhenPlayerEntersAheadWindow()
         {
             Assert.That(TowerStreamingRules.ShouldAppend(100f, 64f, 35f), Is.False);
