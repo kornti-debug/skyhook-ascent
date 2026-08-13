@@ -10,7 +10,7 @@ An endless third-person 3D vertical platformer inside a hollow cylindrical tower
 ## Why this concept was selected
 
 - It builds directly on the third-person 3D work covered in class.
-- Movement, jumping, grappling, and momentum provide a strong playable core.
+- Movement, jumping, ballistic aiming, and fast zip pulls provide a strong playable core.
 - The grappling hook creates a focused technical feature for the video explanation.
 - Procedural chunk assembly supports the optional procedural-generation bonus without requiring arbitrary unverified platform placement.
 - Rising water creates pressure and turns a fall or slow route into a meaningful consequence.
@@ -29,7 +29,8 @@ An endless third-person 3D vertical platformer inside a hollow cylindrical tower
 - Safer jump route versus faster, harder grapple route
 - Fixed visible grapple anchors rather than grappling arbitrary surfaces
 - Grapple projectile follows an arc and requires aiming above distant targets
-- Momentum-preserving swing and release
+- One physical hook that must return after a miss before it can fire again
+- Automatic pull and release after a valid ballistic hit
 - Rising water/void as the primary hazard and timer
 - Height as the primary score
 - Seeded procedural assembly from handcrafted, validated chunk prefabs
@@ -48,7 +49,6 @@ These are no longer active options for this assignment.
 - Free grappling on every surface
 - Large authored campaign
 - Several permanent routes through the whole tower
-- Full rope-climbing or Zelda-style stopped-rope rotation
+- Swinging, pendulum physics, rope climbing, or manual rope-length control
 - Inventory, equipment, or permanent progression
 - Roguelike upgrade system before the complete base loop works
-

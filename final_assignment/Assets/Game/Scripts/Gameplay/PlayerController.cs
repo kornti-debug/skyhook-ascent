@@ -43,8 +43,12 @@ namespace SkyhookAscent.Gameplay
         private float lastGroundedTime = float.NegativeInfinity;
         private float ignoreGroundUntil = float.NegativeInfinity;
         private float minimumGroundNormalY;
+        private bool zipMovementActive;
+        private bool movementEnabled = true;
 
         public bool IsGrounded => Time.time <= lastGroundedTime + coyoteTime;
+        public bool IsZipMovementActive => zipMovementActive;
+        public bool MovementEnabled => movementEnabled;
         public float HorizontalSpeed
         {
             get
@@ -91,8 +95,10 @@ namespace SkyhookAscent.Gameplay
 
         private void Update()
         {
-            if (gameplayMap == null)
+            if (gameplayMap == null || !movementEnabled)
             {
+                moveInput = Vector2.zero;
+                runHeld = false;
                 return;
             }
 
@@ -107,7 +113,7 @@ namespace SkyhookAscent.Gameplay
 
         private void FixedUpdate()
         {
-            if (gameplayMap == null)
+            if (gameplayMap == null || zipMovementActive || !movementEnabled)
             {
                 return;
             }
@@ -115,6 +121,35 @@ namespace SkyhookAscent.Gameplay
             ApplyHorizontalMovement();
             TryJump();
             ApplyVerticalGravity();
+        }
+
+        public void SetZipMovementActive(bool active)
+        {
+            zipMovementActive = active;
+
+            if (active)
+            {
+                jumpQueuedUntil = float.NegativeInfinity;
+                lastGroundedTime = float.NegativeInfinity;
+            }
+        }
+
+        public void SetMovementEnabled(bool enabled)
+        {
+            movementEnabled = enabled;
+            if (enabled)
+            {
+                return;
+            }
+
+            moveInput = Vector2.zero;
+            runHeld = false;
+            jumpQueuedUntil = float.NegativeInfinity;
+
+            if (body != null)
+            {
+                body.linearVelocity = Vector3.zero;
+            }
         }
 
         private void ApplyHorizontalMovement()

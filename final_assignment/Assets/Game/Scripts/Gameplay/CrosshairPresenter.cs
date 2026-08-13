@@ -10,9 +10,11 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(0f)] private float centerGap = 3f;
         [SerializeField, Min(1f)] private float thickness = 2.5f;
 
+        public bool Visible { get; set; } = true;
+
         private void OnGUI()
         {
-            if (Event.current.type != EventType.Repaint)
+            if (!Visible || Event.current.type != EventType.Repaint)
             {
                 return;
             }

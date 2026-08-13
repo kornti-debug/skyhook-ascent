@@ -7,9 +7,9 @@ Target 19-21 minutes. The first gameplay section must remain below 7 minutes.
 | Segment | Target time | Content |
 | --- | ---: | --- |
 | Introduction | 0:30 | Name, one-sentence pitch, controls |
-| Gameplay | 5:30 | One run, safe/risky route choice, grapple swing, rising hazard, death/restart |
+| Gameplay | 5:30 | One run, safe/risky route choice, ballistic zip grapple, rising hazard, death/restart |
 | Project structure | 2:00 | Scene hierarchy, player/anchor/chunk prefabs, config |
-| Grapple implementation | 4:00 | Projectile arc, attachment, rope force, swing assistance, momentum release |
+| Grapple implementation | 4:00 | Projectile arc, single-hook flight/return states, valid attachment, automatic pull, and arrival release |
 | Procedural tower | 3:00 | Chunk metadata, seed, selection, placement, validation, fallback |
 | Unity features and presentation | 2:30 | Input, Rigidbody/collision, LineRenderer, materials/lights/VFX, Inspector setup |
 | Tests and limitations | 1:30 | Focused test, diagnostics, honest cuts |

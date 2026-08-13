@@ -10,7 +10,7 @@ Project: **Skyhook Ascent**
 | Concept and design lock | 2 h | Pitch, mechanics, route model, MVP, and cuts are documented |
 | Repository and MCP foundation | 3 h | Source control, package setup, Unity connection, clean compile |
 | Player movement and camera | 4 h | Walk, run, jump, air control, and camera work in a test scene |
-| Grapple vertical slice | 8 h | Projectile arc, attachment, swing assistance, release, and one landing feel good |
+| Grapple vertical slice | 8 h | Projectile arc, one-hook retrieval, automatic zip, release, and one landing feel good |
 | Run loop and rising hazard | 4 h | Start, climb, water death, height score, and restart work |
 | Procedural tower chunks | 6 h | Fixed-seed chunk assembly works with a safe authored fallback |
 | Aesthetics and feedback | 4 h | Tower readability, anchors, rope, lighting, fog, particles, and UI are coherent |
@@ -23,7 +23,7 @@ Project: **Skyhook Ascent**
 ### Gate 1: concept locked - hour 2
 
 - Vertical inner-tower setting
-- Projectile grapple and momentum release
+- Ballistic projectile and automatic zip grapple
 - Rising hazard
 - Braided chunk routes
 - Procedural chunk assembly
@@ -39,12 +39,12 @@ Project: **Skyhook Ascent**
 
 - Hook visibly follows an arc
 - Only valid anchors attach
-- Swing starts reliably
-- Input can assist the swing
-- Release preserves momentum
-- Player can complete one jump-grapple-land sequence repeatedly
+- A miss visibly returns before another shot becomes available
+- A valid hit starts a fast, collision-aware pull
+- Arrival releases automatically over the intended platform
+- Player can complete one jump-shoot-zip-land sequence repeatedly
 
-If this gate slips by more than two hours, simplify the hook before adding procedural generation: enlarge anchors, shorten miss recovery, and reduce rope options.
+If this gate slips by more than two hours, simplify the hook before adding procedural generation: enlarge anchors, shorten miss recovery, and reduce zip acceleration tuning.
 
 ### Gate 4: complete run - hour 21
 

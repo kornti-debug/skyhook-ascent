@@ -58,16 +58,16 @@ asset is introduced only if sharing or repeated tuning makes it useful.
 
 ## M2 - Grapple Proof
 
-Goal: one satisfying and repeatable jump-grapple-swing-release-land sequence.
+Goal: one satisfying and repeatable jump-shoot-zip-land sequence.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
 | M2.1 | Add a clearly marked grapple-anchor component/layer and one large fixed target | 0.75 h | Done | Only the intended target is considered valid |
 | M2.2 | Add crosshair aiming and a visible gravity-affected hook projectile | 1.5 h | Done | The projectile follows an arc and misses cleanly |
-| M2.3 | Implement attachment, one active rope, rope visualization, and quick miss recovery | 2.0 h | Next | Valid hits attach; invalid hits return without locking input |
-| M2.4 | Implement swing physics and limited tangential input assistance | 1.5 h | Planned | The player can deliberately build useful swing motion |
-| M2.5 | Preserve momentum on release and support ground/air firing | 1.0 h | Planned | Releasing at different points produces understandable trajectories |
-| M2.6 | Build and tune one mandatory grapple gap | 1.25 h | Planned | The complete sequence succeeds repeatedly with base values |
+| M2.3 | Implement one active hook, rope visualization, maximum range, and movement-independent miss retrieval | 2.0 h | Done | A moving or falling player cannot interrupt retrieval; a second shot is blocked until it completes |
+| M2.4 | Implement automatic collision-aware zip pull with speed, acceleration, and timeout | 1.5 h | Done | A valid hit pulls reliably without teleporting or trapping the player |
+| M2.5 | Add automatic arrival release and support ground/air firing | 1.0 h | Done | Reaching an anchor releases predictably over its landing platform |
+| M2.6 | Build and tune one mandatory grapple gap | 1.25 h | Done | The complete sequence succeeds repeatedly with base values |
 
 **Milestone exit:** the central mechanic is fun enough to justify the rest of
 the game. If this exceeds its time box, enlarge anchors, simplify rope behavior,
@@ -83,11 +83,11 @@ Goal: a short non-procedural course with the full start-climb-fail-restart loop.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M3.1 | Extend the handcrafted course with jumps, one recovery platform, and two grapple sections | 0.75 h | Planned | The route demonstrates all core movement |
-| M3.2 | Add the rising hazard and player contact/death | 0.75 h | Planned | The hazard applies pressure and ends the run reliably |
-| M3.3 | Add run state, height score, session best, seed display, and restart | 1.25 h | Planned | One button cleanly resets player, hazard, score, and course state |
-| M3.4 | Add minimal HUD and run-end panel | 0.5 h | Planned | Gameplay and failure state are understandable without explanation |
-| M3.5 | Play-test and balance a two-to-five-minute authored run | 0.75 h | Planned | Full loop works repeatedly before procedural work begins |
+| M3.1 | Extend the handcrafted course with jumps, one recovery platform, and two grapple sections | 0.75 h | Done | The route demonstrates all core movement |
+| M3.2 | Add the rising hazard and player contact/death | 0.75 h | Done | The hazard applies pressure and ends the run reliably |
+| M3.3 | Add run state, height score, session best, seed display, finish, and restart | 1.25 h | Done | One button cleanly resets player, hazard, score, and course state |
+| M3.4 | Add minimal HUD and run-end panel | 0.5 h | Done | Gameplay and failure state are understandable without explanation |
+| M3.5 | Play-test and balance the authored run | 0.75 h | Next | Full loop works repeatedly before procedural work begins |
 
 **Milestone exit:** this is the safe fallback submission version. Procedural
 generation must never be allowed to break this working loop.
@@ -155,6 +155,6 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Implement **M2.3 only**. Attach the existing projectile to valid anchors, show
-one rope, and make invalid hits recover immediately. Swing forces remain in
-M2.4 so attachment can be verified independently.
+Play-test **M3.5**: complete the authored course, deliberately let the flood
+catch the player, and restart both outcomes. Tune the flood only after the
+movement, grapple, win, loss, and restart loop all behave consistently.

@@ -20,6 +20,9 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Range(-89f, 89f)]
         [Tooltip("Prevents the camera from orbiting under the player while aiming upward.")]
         private float minimumOrbitPitch;
+        [SerializeField, Range(-89f, 0f)]
+        [Tooltip("Lowest camera-position orbit used at the maximum upward aim. The transition is eased so aiming never changes camera mode abruptly.")]
+        private float upwardOrbitLimit = -20f;
         [SerializeField, Range(-89f, 89f)] private float initialPitch = 15f;
         [SerializeField] private float initialYaw;
         [SerializeField, Range(-89f, 89f)] private float minimumPitch = -80f;
@@ -131,10 +134,7 @@ namespace SkyhookAscent.Gameplay
 
         private void ApplyCameraTransform(Vector3 pivot)
         {
-            Quaternion positionRotation = Quaternion.Euler(
-                Mathf.Max(pitch, minimumOrbitPitch),
-                yaw,
-                0f);
+            Quaternion positionRotation = Quaternion.Euler(GetPositionPitch(), yaw, 0f);
             Vector3 desiredCameraOffset = positionRotation * new Vector3(
                 shoulderOffset.x,
                 shoulderOffset.y,
@@ -147,6 +147,21 @@ namespace SkyhookAscent.Gameplay
 
             transform.position = pivot + cameraDirection * CurrentDistance;
             transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+
+        private float GetPositionPitch()
+        {
+            if (pitch >= minimumOrbitPitch)
+            {
+                return pitch;
+            }
+
+            float upwardAimRange = Mathf.Max(0.01f, minimumOrbitPitch - minimumPitch);
+            float upwardAmount = Mathf.Clamp01(
+                (minimumOrbitPitch - pitch) / upwardAimRange);
+            float easedAmount = Mathf.SmoothStep(0f, 1f, upwardAmount);
+
+            return Mathf.Lerp(minimumOrbitPitch, upwardOrbitLimit, easedAmount);
         }
 
         private float ResolveCameraDistance(
@@ -195,6 +210,7 @@ namespace SkyhookAscent.Gameplay
         private void OnValidate()
         {
             maximumPitch = Mathf.Max(minimumPitch, maximumPitch);
+            upwardOrbitLimit = Mathf.Min(minimumOrbitPitch, upwardOrbitLimit);
             distance = Mathf.Max(minimumDistance, distance);
             collisionRadius = Mathf.Max(0f, collisionRadius);
             collisionPadding = Mathf.Max(0f, collisionPadding);

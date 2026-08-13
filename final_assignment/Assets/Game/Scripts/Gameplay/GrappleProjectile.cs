@@ -5,17 +5,37 @@ namespace SkyhookAscent.Gameplay
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public sealed class GrappleProjectile : MonoBehaviour
     {
-        [SerializeField, Min(0.1f)] private float lifetime = 2.5f;
+        private enum ProjectileState
+        {
+            Idle,
+            Outbound,
+            Returning,
+            Attached,
+            Finished
+        }
+
+        [SerializeField, Min(0.1f)] private float safetyLifetime = 8f;
+        [SerializeField, Min(0.1f)] private float maximumReturnDuration = 1.25f;
 
         private Rigidbody body;
         private Collider projectileCollider;
         private GrappleController owner;
         private float expiresAt;
-        private bool launched;
-        private bool finished;
+        private float maximumRange;
+        private float distanceTravelled;
+        private float returnSpeed;
+        private float returnCatchDistance;
+        private float returnStartedAt;
+        private float returnDuration;
+        private Vector3 previousPosition;
+        private Vector3 returnStartPosition;
+        private GrappleAnchor attachedAnchor;
+        private ProjectileState state;
 
         public Vector3 Velocity => body != null ? body.linearVelocity : Vector3.zero;
-        public bool IsLaunched => launched && !finished;
+        public bool IsLaunched => state == ProjectileState.Outbound;
+        public bool IsReturning => state == ProjectileState.Returning;
+        public bool IsAttached => state == ProjectileState.Attached;
 
         private void Awake()
         {
@@ -40,37 +60,73 @@ namespace SkyhookAscent.Gameplay
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         }
 
+        private void FixedUpdate()
+        {
+            if (state == ProjectileState.Outbound)
+            {
+                distanceTravelled += Vector3.Distance(body.position, previousPosition);
+                previousPosition = body.position;
+
+                if (distanceTravelled >= maximumRange || Time.time >= expiresAt)
+                {
+                    BeginReturn();
+                }
+            }
+        }
+
         private void Update()
         {
-            if (IsLaunched && Time.time >= expiresAt)
+            if (state == ProjectileState.Returning)
             {
-                Finish(null);
+                UpdateReturn();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (state == ProjectileState.Attached && attachedAnchor != null)
+            {
+                transform.position = attachedAnchor.AttachmentPosition;
             }
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (!IsLaunched)
+            if (state != ProjectileState.Outbound)
             {
                 return;
             }
 
             GrappleAnchor hitAnchor =
                 collision.collider.GetComponentInParent<GrappleAnchor>();
-            Finish(hitAnchor);
+            if (hitAnchor != null)
+            {
+                Attach(hitAnchor);
+            }
+            else
+            {
+                BeginReturn();
+            }
         }
 
         public void Launch(
             Vector3 initialVelocity,
             GrappleController projectileOwner,
-            Collider[] ignoredColliders)
+            Collider[] ignoredColliders,
+            float allowedRange,
+            float retrievalSpeed,
+            float catchDistance)
         {
             CacheComponents();
 
             owner = projectileOwner;
-            launched = true;
-            finished = false;
-            expiresAt = Time.time + lifetime;
+            state = ProjectileState.Outbound;
+            expiresAt = Time.time + safetyLifetime;
+            maximumRange = Mathf.Max(1f, allowedRange);
+            returnSpeed = Mathf.Max(0.1f, retrievalSpeed);
+            returnCatchDistance = Mathf.Max(0.05f, catchDistance);
+            distanceTravelled = 0f;
+            previousPosition = body.position;
             body.linearVelocity = initialVelocity;
 
             if (ignoredColliders == null)
@@ -92,25 +148,103 @@ namespace SkyhookAscent.Gameplay
 
         public void Cancel()
         {
-            Finish(null);
+            Finish();
         }
 
-        private void Finish(GrappleAnchor hitAnchor)
+        public void CompleteAttachment()
         {
-            if (finished)
+            if (state == ProjectileState.Attached)
+            {
+                Finish();
+            }
+        }
+
+        private void Attach(GrappleAnchor hitAnchor)
+        {
+            state = ProjectileState.Attached;
+            attachedAnchor = hitAnchor;
+            body.linearVelocity = Vector3.zero;
+            body.useGravity = false;
+            body.isKinematic = true;
+            projectileCollider.enabled = false;
+            transform.position = hitAnchor.AttachmentPosition;
+            owner?.HandleProjectileAttached(this, hitAnchor);
+        }
+
+        private void BeginReturn()
+        {
+            if (state != ProjectileState.Outbound)
             {
                 return;
             }
 
-            finished = true;
+            state = ProjectileState.Returning;
+            body.linearVelocity = Vector3.zero;
+            body.useGravity = false;
+            body.isKinematic = true;
             projectileCollider.enabled = false;
-            owner?.HandleProjectileFinished(this, hitAnchor);
+
+            returnStartPosition = transform.position;
+            returnStartedAt = Time.time;
+            float initialReturnDistance = owner != null
+                ? Vector3.Distance(returnStartPosition, owner.HookOriginPosition)
+                : 0f;
+            returnDuration = Mathf.Clamp(
+                initialReturnDistance / returnSpeed,
+                Mathf.Max(0.01f, Time.deltaTime),
+                maximumReturnDuration);
+        }
+
+        private void UpdateReturn()
+        {
+            if (owner == null)
+            {
+                Finish();
+                return;
+            }
+
+            Vector3 target = owner.HookOriginPosition;
+            float returnProgress = Mathf.Clamp01(
+                (Time.time - returnStartedAt) / returnDuration);
+            float easedProgress = Mathf.SmoothStep(0f, 1f, returnProgress);
+            Vector3 previousReturnPosition = transform.position;
+            transform.position = Vector3.Lerp(
+                returnStartPosition,
+                target,
+                easedProgress);
+
+            Vector3 returnDirection = transform.position - previousReturnPosition;
+            if (returnDirection.sqrMagnitude > 0.0001f)
+            {
+                transform.rotation = Quaternion.LookRotation(
+                    returnDirection.normalized);
+            }
+
+            if (returnProgress >= 1f ||
+                Vector3.Distance(transform.position, target) <= returnCatchDistance)
+            {
+                transform.position = target;
+                Finish();
+            }
+        }
+
+        private void Finish()
+        {
+            if (state == ProjectileState.Finished)
+            {
+                return;
+            }
+
+            state = ProjectileState.Finished;
+            projectileCollider.enabled = false;
+            owner?.HandleProjectileRecovered(this);
             Destroy(gameObject);
         }
 
         private void OnValidate()
         {
-            lifetime = Mathf.Max(0.1f, lifetime);
+            safetyLifetime = Mathf.Max(0.1f, safetyLifetime);
+            maximumReturnDuration = Mathf.Max(0.1f, maximumReturnDuration);
         }
     }
 }

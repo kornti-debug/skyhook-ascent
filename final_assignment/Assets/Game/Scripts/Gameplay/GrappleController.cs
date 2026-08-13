@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 namespace SkyhookAscent.Gameplay
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Rigidbody), typeof(PlayerController))]
     public sealed class GrappleController : MonoBehaviour
     {
         private const string GameplayMapName = "Gameplay";
@@ -23,17 +24,46 @@ namespace SkyhookAscent.Gameplay
         [Header("Aim")]
         [SerializeField, Min(1f)] private float zeroingDistance = 25f;
 
+        [Header("Hook Cycle")]
+        [SerializeField, Min(1f)] private float maximumRange = 22f;
+        [SerializeField, Min(0.1f)] private float returnSpeed = 28f;
+        [SerializeField, Min(0.05f)] private float returnCatchDistance = 0.45f;
+
+        [Header("Zip Pull")]
+        [SerializeField, Min(0.1f)] private float pullSpeed = 16f;
+        [SerializeField, Min(0.1f)] private float pullAcceleration = 70f;
+        [SerializeField, Min(0.1f)] private float arrivalDistance = 1.35f;
+        [SerializeField, Min(0.1f)] private float maximumPullDuration = 2.5f;
+
+        [Header("Rope")]
+        [SerializeField, Min(0.005f)] private float ropeWidth = 0.035f;
+        [SerializeField] private Color ropeColor = new Color(0.15f, 0.9f, 1f, 1f);
+
         private InputAction grappleAction;
         private Collider[] ownerColliders;
         private GrappleProjectile activeProjectile;
+        private GrappleAnchor activeAnchor;
+        private Rigidbody playerBody;
+        private PlayerController playerController;
+        private LineRenderer ropeRenderer;
+        private Material runtimeRopeMaterial;
+        private float pullExpiresAt;
+        private bool grappleEnabled = true;
 
         public GrappleProjectile ActiveProjectile => activeProjectile;
         public bool HasActiveProjectile => activeProjectile != null;
+        public bool IsPulling => activeAnchor != null;
+        public bool CanFire => grappleEnabled && activeProjectile == null && !IsPulling;
+        public Vector3 HookOriginPosition =>
+            transform.position + Vector3.up * verticalSpawnOffset;
         public GrappleAnchor LastHitAnchor { get; private set; }
 
         private void Awake()
         {
             ownerColliders = GetComponentsInChildren<Collider>(true);
+            playerBody = GetComponent<Rigidbody>();
+            playerController = GetComponent<PlayerController>();
+            ConfigureRopeRenderer();
 
             if (aimCamera == null)
             {
@@ -56,24 +86,69 @@ namespace SkyhookAscent.Gameplay
         private void OnDisable()
         {
             grappleAction?.Disable();
+            ResetGrapple(true);
         }
 
         private void Update()
         {
-            if (grappleAction != null && grappleAction.WasPressedThisFrame())
+            if (grappleEnabled && grappleAction != null && grappleAction.WasPressedThisFrame())
             {
                 FireProjectile();
             }
         }
 
-        public void FireProjectile()
+        private void FixedUpdate()
         {
-            if (aimCamera == null || projectilePrefab == null)
+            if (!IsPulling || playerBody == null)
             {
                 return;
             }
 
-            CancelActiveProjectile();
+            Vector3 toAnchor = activeAnchor.AttachmentPosition - playerBody.position;
+            if (toAnchor.magnitude <= arrivalDistance)
+            {
+                CompleteZip(true);
+                return;
+            }
+
+            if (Time.time >= pullExpiresAt)
+            {
+                CompleteZip(false);
+                return;
+            }
+
+            Vector3 desiredVelocity = toAnchor.normalized * pullSpeed;
+            playerBody.linearVelocity = Vector3.MoveTowards(
+                playerBody.linearVelocity,
+                desiredVelocity,
+                pullAcceleration * Time.fixedDeltaTime);
+        }
+
+        private void LateUpdate()
+        {
+            if (ropeRenderer == null)
+            {
+                return;
+            }
+
+            bool showRope = activeProjectile != null;
+            ropeRenderer.enabled = showRope;
+            if (!showRope)
+            {
+                return;
+            }
+
+            ropeRenderer.SetPosition(0, HookOriginPosition);
+            ropeRenderer.SetPosition(1, activeProjectile.transform.position);
+        }
+
+        public void FireProjectile()
+        {
+            if (!grappleEnabled || !CanFire || aimCamera == null || projectilePrefab == null)
+            {
+                return;
+            }
+
             LastHitAnchor = null;
 
             Transform cameraTransform = aimCamera.transform;
@@ -96,28 +171,145 @@ namespace SkyhookAscent.Gameplay
             activeProjectile.Launch(
                 launchVelocity,
                 this,
-                ownerColliders);
+                ownerColliders,
+                maximumRange,
+                returnSpeed,
+                returnCatchDistance);
         }
 
         public void CancelActiveProjectile()
         {
-            if (activeProjectile != null)
+            ResetGrapple(true);
+        }
+
+        public void SetGrappleEnabled(bool enabled)
+        {
+            grappleEnabled = enabled;
+            if (!enabled)
             {
-                activeProjectile.Cancel();
+                CancelActiveProjectile();
             }
         }
 
-        internal void HandleProjectileFinished(
+        internal void HandleProjectileAttached(
             GrappleProjectile projectile,
             GrappleAnchor hitAnchor)
+        {
+            if (activeProjectile != projectile || hitAnchor == null)
+            {
+                return;
+            }
+
+            LastHitAnchor = hitAnchor;
+            activeAnchor = hitAnchor;
+            pullExpiresAt = Time.time + maximumPullDuration;
+            playerController.SetZipMovementActive(true);
+            playerBody.useGravity = false;
+        }
+
+        internal void HandleProjectileRecovered(GrappleProjectile projectile)
         {
             if (activeProjectile != projectile)
             {
                 return;
             }
 
-            LastHitAnchor = hitAnchor;
             activeProjectile = null;
+
+            if (activeAnchor != null)
+            {
+                EndPlayerPull(false);
+            }
+        }
+
+        private void CompleteZip(bool reachedAnchor)
+        {
+            GrappleProjectile projectile = activeProjectile;
+            activeAnchor = null;
+            EndPlayerPull(reachedAnchor);
+
+            if (projectile != null)
+            {
+                projectile.CompleteAttachment();
+            }
+        }
+
+        private void EndPlayerPull(bool reachedAnchor)
+        {
+            playerController.SetZipMovementActive(false);
+            playerBody.useGravity = true;
+
+            if (reachedAnchor)
+            {
+                playerBody.linearVelocity = Vector3.zero;
+            }
+            else
+            {
+                playerBody.linearVelocity = Vector3.ClampMagnitude(
+                    playerBody.linearVelocity,
+                    4f);
+            }
+        }
+
+        private void ResetGrapple(bool stopPlayer)
+        {
+            GrappleProjectile projectile = activeProjectile;
+            activeProjectile = null;
+            activeAnchor = null;
+
+            if (stopPlayer && playerController != null && playerBody != null)
+            {
+                EndPlayerPull(false);
+            }
+
+            if (projectile != null)
+            {
+                projectile.Cancel();
+            }
+
+            if (ropeRenderer != null)
+            {
+                ropeRenderer.enabled = false;
+            }
+        }
+
+        private void ConfigureRopeRenderer()
+        {
+            ropeRenderer = GetComponent<LineRenderer>();
+            if (ropeRenderer == null)
+            {
+                ropeRenderer = gameObject.AddComponent<LineRenderer>();
+            }
+
+            ropeRenderer.useWorldSpace = true;
+            ropeRenderer.positionCount = 2;
+            ropeRenderer.startWidth = ropeWidth;
+            ropeRenderer.endWidth = ropeWidth;
+            ropeRenderer.numCapVertices = 4;
+            ropeRenderer.enabled = false;
+
+            Shader ropeShader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (ropeShader == null)
+            {
+                ropeShader = Shader.Find("Sprites/Default");
+            }
+
+            if (ropeShader != null)
+            {
+                runtimeRopeMaterial = new Material(ropeShader)
+                {
+                    color = ropeColor
+                };
+                ropeRenderer.sharedMaterial = runtimeRopeMaterial;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (runtimeRopeMaterial != null)
+            {
+                Destroy(runtimeRopeMaterial);
+            }
         }
 
         private void OnValidate()
@@ -125,6 +317,14 @@ namespace SkyhookAscent.Gameplay
             launchSpeed = Mathf.Max(0.1f, launchSpeed);
             forwardSpawnOffset = Mathf.Max(0f, forwardSpawnOffset);
             zeroingDistance = Mathf.Max(1f, zeroingDistance);
+            maximumRange = Mathf.Max(1f, maximumRange);
+            returnSpeed = Mathf.Max(0.1f, returnSpeed);
+            returnCatchDistance = Mathf.Max(0.05f, returnCatchDistance);
+            pullSpeed = Mathf.Max(0.1f, pullSpeed);
+            pullAcceleration = Mathf.Max(0.1f, pullAcceleration);
+            arrivalDistance = Mathf.Max(0.1f, arrivalDistance);
+            maximumPullDuration = Mathf.Max(0.1f, maximumPullDuration);
+            ropeWidth = Mathf.Max(0.005f, ropeWidth);
         }
     }
 }

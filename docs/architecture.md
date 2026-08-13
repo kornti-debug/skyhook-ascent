@@ -83,8 +83,8 @@ For Skyhook Ascent, a likely small structure is:
 ```text
 PlayerController.cs        Movement, grounded jump, and player physics
 ThirdPersonCameraController.cs  Orbit, follow smoothing, and wall avoidance
-GrappleController.cs       Hook lifecycle, attachment, swing, and release
-GrappleProjectile.cs       Projectile motion and anchor collision
+GrappleController.cs       Single-hook lifecycle, rope feedback, zip pull, and release
+GrappleProjectile.cs       Ballistic flight, anchor collision, attachment, and return
 GrappleAnchor.cs           Valid target marker and presentation reference
 TowerChunk.cs              Entry, exit, bounds, difficulty, and metadata
 TowerGenerator.cs          Seeded chunk selection, placement, and cleanup

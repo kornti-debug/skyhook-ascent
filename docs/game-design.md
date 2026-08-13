@@ -5,17 +5,17 @@ Working title: **Skyhook Ascent**
 
 ## One-sentence pitch
 
-An endless 3D vertical platformer where the player outruns a rising flood by jumping through a procedurally assembled tower and using a gravity-affected grappling hook to swing across larger gaps.
+An endless 3D vertical platformer where the player outruns a rising flood by jumping through a procedurally assembled tower and landing gravity-affected hook shots that zip them upward.
 
 ## Player experience
 
-The player should understand "go up before the water reaches you" within 15 seconds. Running, jumping, firing the hook, swinging, and releasing should feel responsive enough that failure feels caused by a readable decision or execution mistake.
+The player should understand "go up before the water reaches you" within 15 seconds. Running, jumping, landing a ballistic hook shot, and being pulled to the next platform should feel responsive enough that failure feels caused by a readable decision or execution mistake.
 
 A typical early run should last 2-5 minutes. Better players can continue until the increasing difficulty and hazard speed overwhelm them.
 
 ## Design pillars
 
-1. **Satisfying momentum:** movement, grapple attachment, swing, and release form one continuous flow.
+1. **Fast vertical flow:** movement, a skillful hook shot, and the automatic zip form one continuous climb.
 2. **Readable risk:** the player can see anchors, platforms, route choices, and the rising hazard.
 3. **Meaningful short choices:** safe jump routes cost time; difficult grapple routes gain height quickly.
 4. **Controlled randomness:** runs vary, but every required route is valid with base abilities.
@@ -25,15 +25,15 @@ A typical early run should last 2-5 minutes. Better players can continue until t
 The level is the interior of a hollow cylindrical tower:
 
 - Platforms attach to the inner wall or project into the central shaft.
-- Grapple anchors hang above gaps or attach to structural beams.
+- Grapple anchors are centered in clear space above their intended landing platforms.
 - Chunks rotate around the vertical axis, creating an upward spiral without requiring one continuous staircase.
-- The central shaft provides space for visible swings and dramatic falls.
+- The central shaft provides space for readable projectile arcs, fast zip lines, and dramatic falls.
 - The camera follows the player inside the tower rather than showing the entire structure.
 
 Every chunk has one entrance and one exit. Most chunks have one readable route. Selected chunks contain a short branch:
 
 - **Safe route:** more platforms and easier jumps, but slower.
-- **Risk route:** fewer platforms and a demanding grapple swing, but faster.
+- **Risk route:** fewer platforms and a demanding ballistic grapple shot, but faster.
 - Both routes rejoin at the chunk exit.
 
 Mandatory grapple chunks ensure the main mechanic cannot be ignored.
@@ -68,12 +68,12 @@ The first prototype may use a capsule and primitives. Character animation is not
 - Projectile is affected by gravity, so distant anchors require aiming above them
 - No target snapping or ballistic compensation; objects under the crosshair do not alter the launch
 - Only objects on the grapple-anchor layer can be attached
-- A missed hook returns or reloads quickly
-- One active grapple at a time
-- Rope length is established on attachment
-- Gravity and current velocity create the swing
-- Movement input applies limited tangential swing assistance
-- Releasing preserves velocity
+- The hook has a fixed maximum travel range
+- A missed hook visibly returns to the player's current position before another shot is available, even while the player moves or falls
+- There is exactly one active hook: firing is blocked while it is flying, returning, or pulling
+- A valid hit automatically pulls the player toward the anchor at a capped speed
+- The hook releases automatically near the anchor, allowing the player to fall onto the platform below it
+- The rope is visual feedback and shortens naturally as the distance closes; it is not a simulated pendulum
 - Grapple can be fired from the ground or in the air
 
 Not included in the MVP:
@@ -81,7 +81,8 @@ Not included in the MVP:
 - Attaching to arbitrary surfaces
 - Reeling the rope in and out
 - Climbing the rope
-- Completely stopping, rotating, and restarting a swing
+- Swinging or pendulum physics
+- Manual rope-length control
 - Multiple simultaneous hooks
 
 ### Failure and recovery
@@ -126,6 +127,22 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 5. Recovery/rest section
 6. Finish/debug section used before endless streaming is enabled
 
+### Authored chunk prototype
+
+Before prefab conversion or procedural assembly, `Gameplay.unity` contains a
+manually arranged clockwise spiral made from four named chunk groups:
+
+1. `Chunk_00_Warmup`: three increasingly high jump platforms.
+2. `Chunk_01_Zip`: one mandatory ballistic shot to an anchor centered above a
+   wide landing platform.
+3. `Chunk_02_Jumps`: two more platforms continuing around the tower axis.
+4. `Chunk_03_MixedRecovery`: a second zip landing followed by a normal jump and
+   a wider recovery/exit platform.
+
+Each group has an `Entry` and `Exit` transform showing how chunks will connect.
+The scene objects remain authored prototypes until every transition is
+play-tested. Only validated groups become reusable chunk prefabs.
+
 ## Difficulty progression
 
 Difficulty can increase through:
@@ -154,14 +171,22 @@ Required run-end UI:
 - Seed
 - Restart
 
+The authored fallback course ends at a visible goal marker on the final recovery
+platform. Reaching it produces a `Tower Cleared` result; contact with the rising
+flood produces a failure result. Both states freeze movement and accept `R` to
+restart the same course. Endless continuation replaces this finish only after
+procedural streaming is proven.
+
 Persistent high scores are optional.
 
 ## MVP acceptance criteria
 
 - Player can walk, run, jump, and control direction in the air.
 - Grapple projectile visibly arcs and attaches only to valid anchors.
-- Attached player can swing and release with preserved momentum.
+- A valid hit automatically zips the player to the anchor and releases near it.
+- A miss reaches its range or an invalid surface, returns visibly, and only then restores grapple readiness.
 - One handcrafted course supports a complete start-climb-fail-restart loop.
+- The authored course has a visible finish and supports a win-restart loop.
 - Rising hazard reliably ends the run.
 - At least four chunk prefabs assemble from a fixed seed.
 - Repeating a seed produces the same chunk sequence.
@@ -184,7 +209,7 @@ Possible upgrades must not be required by generation:
 
 - Longer grapple range
 - Faster hook recovery
-- Stronger swing assistance
+- Faster zip pull
 - Better air control
 - Slightly higher jump
 - One recovery from a fatal fall
@@ -213,8 +238,9 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 
 ## Known risks
 
-- Grapple feel may consume more tuning time than expected.
+- Zip speed, arrival distance, and anchor placement may consume more tuning time than expected.
 - A real projectile can miss thin targets at speed; collision handling must be robust.
+- A blocked path to an anchor must time out without trapping the player in the pulling state.
 - Camera collision inside the cylindrical tower needs early testing.
 - Generated chunk rotation can create visual intersections even when traversal remains valid.
 - Rising hazard speed must pressure the player without making safe routes pointless.
