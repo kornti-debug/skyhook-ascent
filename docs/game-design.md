@@ -148,7 +148,9 @@ are then removed.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly
-  within a stage.
+  within a stage. Prototype tuning starts at 0.65 m/s, adds 0.20 m/s per stage
+  plus up to 0.10 m/s within the current stage, and caps the total additional
+  speed at 2.0 m/s.
 - Stage geometry and materials must not change the reachability rules.
 
 Every chunk must be tested with base movement and grapple values. Upgrades may make routes easier or unlock optional shortcuts, but required progression never depends on an upgrade.

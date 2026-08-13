@@ -5,11 +5,11 @@ namespace SkyhookAscent.Gameplay
     [DisallowMultipleComponent]
     public sealed class RisingHazard : MonoBehaviour
     {
-        [SerializeField, Min(0f)] private float riseSpeed = 0.45f;
-        [SerializeField, Min(0f)] private float maximumAdditionalSpeed = 1.4f;
+        [SerializeField, Min(0f)] private float riseSpeed = 0.65f;
+        [SerializeField, Min(0f)] private float maximumAdditionalSpeed = 2f;
         [SerializeField, Min(1f)] private float stageHeight = 100f;
-        [SerializeField, Min(0f)] private float stageSpeedIncrease = 0.14f;
-        [SerializeField, Min(0f)] private float withinStageSpeedIncrease = 0.08f;
+        [SerializeField, Min(0f)] private float stageSpeedIncrease = 0.2f;
+        [SerializeField, Min(0f)] private float withinStageSpeedIncrease = 0.1f;
 
         private Vector3 startPosition;
         private float highestPlayerHeight;

@@ -474,6 +474,8 @@ MonoBehaviour:
   generationAheadDistance: 35
   cleanupBelowWaterMargin: 2
   appendRetryDelay: 1
+  minimumTransitionRise: 1
+  maximumTransitionRise: 1.5
   maximumHorizontalRadius: 12
   maximumTurnAngle: 100
   overlapPadding: 0.1
@@ -2131,11 +2133,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ef66f3acddef704fab23e3eb8bb7052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.RisingHazard
-  riseSpeed: 0.45
-  maximumAdditionalSpeed: 1.4
+  riseSpeed: 0.65
+  maximumAdditionalSpeed: 2
   stageHeight: 100
-  stageSpeedIncrease: 0.14
-  withinStageSpeedIncrease: 0.08
+  stageSpeedIncrease: 0.2
+  withinStageSpeedIncrease: 0.1
 --- !u!23 &1354439702
 MeshRenderer:
   m_ObjectHideFlags: 0

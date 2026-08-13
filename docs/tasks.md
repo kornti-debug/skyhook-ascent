@@ -108,8 +108,8 @@ reproducible, testable, and explainable.
 | M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
 | M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
 | M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removes each submerged chunk and deletes a stage root once it becomes empty |
-| M4.10 | Add a round transition landing and rotating stage material palettes | 1.5 h | Done | The landing has a flat mesh collider, a validated 1.25 m upward jump, and clearance from both neighbours |
-| M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; the stage HUD and speed increase follow visible transitions |
+| M4.10 | Add a round transition landing and rotating stage material palettes | 1.5 h | Done | The landing has a flat mesh collider, a validated 1.25 m upward jump, and cannot obstruct protected jump or grapple corridors |
+| M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; flood starts at 0.65 m/s and scales visibly with each stage |
 
 **Milestone exit:** at least four chunks assemble deterministically, required
 routes work with base abilities, and generated chunks do not visibly overlap.

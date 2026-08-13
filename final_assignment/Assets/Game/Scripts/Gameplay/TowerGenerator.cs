@@ -632,12 +632,24 @@ namespace SkyhookAscent.Gameplay
                     continue;
                 }
 
-                if (!requirePreviousSeparation &&
-                    instance.BlocksAnyClearance(protectedClearances))
+                if (instance.BlocksAnyClearance(protectedClearances))
                 {
                     clearanceRejections++;
                     DeactivateAndDestroy(instance.gameObject);
                     continue;
+                }
+
+                if (previousChunk != null)
+                {
+                    List<TraversalClearanceSegment> candidateClearances =
+                        new List<TraversalClearanceSegment>();
+                    instance.AppendWorldClearanceSegments(candidateClearances);
+                    if (previousChunk.BlocksAnyClearance(candidateClearances))
+                    {
+                        clearanceRejections++;
+                        DeactivateAndDestroy(instance.gameObject);
+                        continue;
+                    }
                 }
 
                 bool isTransitionNeighbour = requirePreviousSeparation ||

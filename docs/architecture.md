@@ -118,7 +118,10 @@ earlier jump or grapple approach. Physics transforms are synchronized before
 those tests, and an additional inferred final-landing corridor prevents the next
 chunk from forming a wall across the preceding chunk's last jump. Stage
 transitions additionally require a 1.0-1.5 m vertical rise; the current prefab
-uses 1.25 m so the boundary is a normal upward jump.
+uses 1.25 m so the boundary is a normal upward jump. Transitions are not exempt
+from protected traversal corridors: their landing geometry must also leave every
+preceding grapple trajectory unobstructed. Seam validation is bidirectional, so
+the previous chunk also cannot obstruct the new chunk's firing or jump corridor.
 
 These are seams, not a requirement to create every file immediately. Begin with
 `PlayerController`, `GrappleController`, and one handcrafted test scene.
