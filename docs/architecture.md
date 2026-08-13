@@ -106,7 +106,7 @@ fallback rather than becoming hidden generator data.
 `FinishGoal` owns landing detection only for the authored fallback. Generated
 play is endless. `RunController` owns loss presentation and the restart input
 bridge, while `TowerGenerator` alone owns run seeds, transactional stage
-generation, transition palettes, and below-flood stage cleanup.
+generation, transition palettes, and below-flood per-chunk cleanup.
 
 Every chunk serializes an incoming direction, outgoing direction, and traversal
 clearance width captured from its real prefab geometry. Placement permits

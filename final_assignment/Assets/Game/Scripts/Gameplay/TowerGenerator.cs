@@ -77,7 +77,22 @@ namespace SkyhookAscent.Gameplay
                 int total = 0;
                 for (int i = 0; i < activeStages.Count; i++)
                 {
-                    total += activeStages[i].ChunkCount;
+                    Transform stageRoot = activeStages[i].Root;
+                    if (stageRoot == null)
+                    {
+                        continue;
+                    }
+
+                    for (int childIndex = 0;
+                        childIndex < stageRoot.childCount;
+                        childIndex++)
+                    {
+                        GameObject child = stageRoot.GetChild(childIndex).gameObject;
+                        if (child.activeSelf && child.GetComponent<TowerChunk>() != null)
+                        {
+                            total++;
+                        }
+                    }
                 }
 
                 return total;
@@ -125,7 +140,7 @@ namespace SkyhookAscent.Gameplay
                 }
             }
 
-            CleanupSubmergedStages();
+            CleanupSubmergedChunks();
         }
 
         public int GetStageIndexAtHeight(float worldHeight)
@@ -593,7 +608,12 @@ namespace SkyhookAscent.Gameplay
                     continue;
                 }
 
+                bool isTransitionNeighbour = previousChunk != null &&
+                    previousChunk.ChunkId == "stage-transition";
+                bool overlapsTransitionNeighbour = isTransitionNeighbour &&
+                    OverlapsSolidGeometry(instance, previousChunk);
                 if (IsInsideTower(instance.Exit.position, bounds) &&
+                    !overlapsTransitionNeighbour &&
                     !OverlapsEarlierChunk(bounds))
                 {
                     return instance;
@@ -635,25 +655,103 @@ namespace SkyhookAscent.Gameplay
             return false;
         }
 
-        private void CleanupSubmergedStages()
+        private static bool OverlapsSolidGeometry(
+            TowerChunk first,
+            TowerChunk second)
         {
-            if (hazard == null || activeStages.Count <= 2)
+            if (first == null || second == null)
+            {
+                return false;
+            }
+
+            Collider[] firstColliders = first.GetComponentsInChildren<Collider>(true);
+            Collider[] secondColliders = second.GetComponentsInChildren<Collider>(true);
+            for (int firstIndex = 0; firstIndex < firstColliders.Length; firstIndex++)
+            {
+                Collider firstCollider = firstColliders[firstIndex];
+                if (!firstCollider.enabled || firstCollider.isTrigger)
+                {
+                    continue;
+                }
+
+                Bounds firstBounds = firstCollider.bounds;
+                firstBounds.Expand(-0.05f);
+                for (int secondIndex = 0;
+                    secondIndex < secondColliders.Length;
+                    secondIndex++)
+                {
+                    Collider secondCollider = secondColliders[secondIndex];
+                    if (!secondCollider.enabled || secondCollider.isTrigger)
+                    {
+                        continue;
+                    }
+
+                    Bounds secondBounds = secondCollider.bounds;
+                    secondBounds.Expand(-0.05f);
+                    if (firstBounds.Intersects(secondBounds))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void CleanupSubmergedChunks()
+        {
+            if (hazard == null)
             {
                 return;
             }
 
-            while (activeStages.Count > 2 &&
-                TowerStreamingRules.CanRecycle(
-                    activeStages[0].HighestY,
-                    hazard.SurfaceHeight,
-                    cleanupBelowWaterMargin))
+            int removedChunkCount = 0;
+            for (int stageIndex = 0; stageIndex < activeStages.Count; stageIndex++)
             {
-                StageRecord removed = activeStages[0];
-                activeStages.RemoveAt(0);
-                DetachAndDestroyCourseRoot(removed.Root);
+                Transform stageRoot = activeStages[stageIndex].Root;
+                if (stageRoot == null)
+                {
+                    continue;
+                }
+
+                for (int childIndex = stageRoot.childCount - 1;
+                    childIndex >= 0;
+                    childIndex--)
+                {
+                    Transform child = stageRoot.GetChild(childIndex);
+                    TowerChunk chunk = child.GetComponent<TowerChunk>();
+                    if (chunk == null ||
+                        !TowerStreamingRules.CanRecycle(
+                            chunk.GetWorldBounds().max.y,
+                            hazard.SurfaceHeight,
+                            cleanupBelowWaterMargin))
+                    {
+                        continue;
+                    }
+
+                    child.SetParent(null, true);
+                    DeactivateAndDestroy(child.gameObject);
+                    removedChunkCount++;
+                }
+            }
+
+            for (int stageIndex = activeStages.Count - 1; stageIndex >= 0; stageIndex--)
+            {
+                StageRecord stage = activeStages[stageIndex];
+                if (stage.Root != null && stage.Root.childCount > 0)
+                {
+                    continue;
+                }
+
+                activeStages.RemoveAt(stageIndex);
+                DetachAndDestroyCourseRoot(stage.Root);
+            }
+
+            if (removedChunkCount > 0)
+            {
                 Debug.Log(
-                    $"Recycled submerged stage {removed.StageIndex + 1}. " +
-                    $"Active stages={activeStages.Count}.",
+                    $"Recycled {removedChunkCount} submerged chunk(s). " +
+                    $"Active stages={activeStages.Count}, chunks={GeneratedChunkTotal}.",
                     this);
             }
         }

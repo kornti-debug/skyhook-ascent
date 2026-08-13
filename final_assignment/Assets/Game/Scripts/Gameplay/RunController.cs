@@ -243,7 +243,7 @@ namespace SkyhookAscent.Gameplay
                 normal = { textColor = Color.white }
             };
 
-            GUI.Box(new Rect(20f, 20f, 370f * scale, 144f * scale), string.Empty);
+            GUI.Box(new Rect(20f, 20f, 370f * scale, 176f * scale), string.Empty);
             GUI.Label(new Rect(36f, 30f, 330f * scale, 30f * scale),
                 $"HEIGHT  {runHeight:0.0} m", labelStyle);
             GUI.Label(new Rect(36f, 62f, 330f * scale, 30f * scale),
@@ -252,6 +252,8 @@ namespace SkyhookAscent.Gameplay
                 $"SEED  {displayedSeed}", labelStyle);
             GUI.Label(new Rect(36f, 126f, 330f * scale, 30f * scale),
                 $"STAGE  {(hazard != null ? hazard.CurrentStage + 1 : 1)}", labelStyle);
+            GUI.Label(new Rect(36f, 158f, 330f * scale, 30f * scale),
+                $"FLOOD  {(hazard != null ? hazard.CurrentSpeed : 0f):0.00} m/s", labelStyle);
 
             if (!runEnded)
             {

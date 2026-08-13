@@ -130,16 +130,16 @@ Generation rules:
 The current implementation starts with one validated 24-chunk stage and streams
 another complete stage before the player approaches the generated top. Each
 stage is built transactionally from the displayed run seed: an invalid candidate
-is discarded without disturbing the playable tower. Whole stages are recycled
-only after their highest point is below the flood, while at least two stages
-remain active.
+is discarded without disturbing the playable tower. Individual chunks are
+recycled once their highest point is safely below the flood; empty stage roots
+are then removed.
 
 ### Height stages
 
 - Each generated section begins a new visual stage after roughly 80-100 metres
   of climbing; the exact height varies with the selected chunks.
-- A wide transition platform clearly separates stages and provides a short
-  pacing reset. It may contain a central opening when that route is validated.
+- A slightly oversized round landing platform clearly separates stages and
+  provides a short pacing reset without spanning or blocking the tower shaft.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The flood speed increases at each stage boundary and may also rise smoothly
@@ -155,7 +155,7 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 3. Mandatory grapple across the shaft
 4. Safe jumps versus grapple shortcut
 5. Recovery/rest section
-6. Wide transition ring between generated stages
+6. Round transition landing between generated stages
 
 ### Authored chunk prototype
 
@@ -198,6 +198,7 @@ Required HUD:
 - Best height for the session
 - Hazard proximity or clear visual warning
 - Grapple readiness/return state if it is not obvious from animation
+- Current flood speed
 
 Required run-end UI:
 
@@ -286,9 +287,8 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - Clearance validation uses a conservative sampled corridor rather than an
   exact simulation of every possible ballistic aiming arc. It prevents known
   platform obstructions but does not replace manual traversal testing.
-- Streaming and cleanup operate on complete 24-chunk stages rather than on
-  individual chunks. This is intentionally simple and may retain more objects
-  than a production pooling system.
-- The transition ring and three stage palettes are functional prototype art;
+- Cleanup destroys submerged chunks instead of pooling them. This is adequate
+  for the assignment but creates more runtime allocations than a production pool.
+- The transition landing and three stage palettes are functional prototype art;
   their final appearance and traversal feel still need a human play-test.
 - Roguelike upgrades are not implemented and remain outside the current MVP.

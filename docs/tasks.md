@@ -107,8 +107,8 @@ reproducible, testable, and explainable.
 | M4.6 | Add landing-based finish, generated-run restart, and longer hazard progression | 0.75 h | Done | The finite regression goal works; `R` resets the player and creates a fresh tower |
 | M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
 | M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
-| M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removed only whole stages below the flood and retained two or more active stages |
-| M4.10 | Add a wide transition chunk and rotating stage material palettes | 1.5 h | Done | A broad ring with a central opening starts each streamed stage; stone, ember, and ice palettes cycle |
+| M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removes each submerged chunk and deletes a stage root once it becomes empty |
+| M4.10 | Add a round transition landing and rotating stage material palettes | 1.5 h | Done | A compact round landing starts each streamed stage; stone, ember, and ice palettes cycle without blocking the shaft |
 | M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; the stage HUD and speed increase follow visible transitions |
 
 **Milestone exit:** at least four chunks assemble deterministically, required
@@ -160,7 +160,7 @@ No stretch task may make a required generated route depend on an upgrade.
 ## Immediate next action
 
 Manually traverse at least two full generated stages from the start. Confirm the
-transition ring is readable and passable, the palette and HUD stage change at
-the same boundary, the flood becomes faster, and streaming is not visible as a
+transition landing is readable and passable, the palette and HUD stage change at
+the same boundary, the displayed flood speed increases, and streaming is not visible as a
 pause. Also press `R` while airborne and during an active grapple to confirm the
 player always returns to the start. After that, begin **M5.1** visual polish.

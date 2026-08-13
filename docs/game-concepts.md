@@ -35,7 +35,7 @@ An endless third-person 3D vertical platformer inside a hollow cylindrical tower
 - Height as the primary score
 - Seeded procedural assembly from handcrafted, validated chunk prefabs
 - `R` returns to the ground and creates a fresh seed and route
-- A wide transition platform, new material palette, and faster flood mark each
+- A compact round transition landing, new material palette, and faster flood mark each
   generated stage (roughly 80-100 m with the current chunks)
 
 ## Parked alternatives
