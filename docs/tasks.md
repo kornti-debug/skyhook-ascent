@@ -126,13 +126,18 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | Planned | Platforms, walls, hazard, and background are visually distinct |
+| M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | In progress | Platforms, walls, hazard, and background are visually distinct |
 | M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Planned | Valid anchors are identifiable during motion |
 | M5.3 | Improve rope/projectile/hit/release feedback | 0.75 h | Planned | Hook state is understandable without additional HUD text |
-| M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | Planned | The route remains readable from the gameplay camera |
+| M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | In progress | The route remains readable from the gameplay camera |
 | M5.5 | Polish HUD and optional minimal audio if time remains | 0.5 h | Planned | UI is legible; audio is never required for understanding |
 
 No imported asset or audio is added without recording its license/source.
+
+The first visual-foundation pass uses only built-in URP materials: a slate,
+ice, and ember stage palette; a matching start floor; a deep-blue background;
+and restrained ambient light and distance fog. The structural shell, explicit
+hazard warning, and any particles remain deliberately unfinished.
 
 ## M6 - Submission Candidate
 

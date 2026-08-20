@@ -149,6 +149,10 @@ are then removed.
   every platform in the immediately preceding chunk.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
+- The first presentation pass uses a restrained slate, ice, and ember palette
+  against a dark-blue background. Cool directional light, tri-light ambient
+  color, and subtle exponential fog separate the route from distant geometry
+  without adding imported art assets.
 - The flood speed increases at each stage boundary and may also rise smoothly
   within a stage. Prototype tuning starts at 0.65 m/s, adds 0.20 m/s per stage
   plus up to 0.10 m/s within the current stage, and caps the total additional
@@ -303,6 +307,7 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
   platform obstructions but does not replace manual traversal testing.
 - Cleanup destroys submerged chunks instead of pooling them. This is adequate
   for the assignment but creates more runtime allocations than a production pool.
-- The transition landing and three stage palettes are functional prototype art;
-  their final appearance and traversal feel still need a human play-test.
+- The transition landing and three stage palettes have a first coherent color,
+  lighting, and fog pass; the structural tower shell and final traversal
+  readability still need a human play-test.
 - Roguelike upgrades are not implemented and remain outside the current MVP.
