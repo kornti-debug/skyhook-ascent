@@ -162,7 +162,7 @@ Goal: freeze features and prove the project can be graded reliably.
 | --- | --- | ---: | --- | --- |
 | M6.1 | Run focused EditMode tests and manual Play Mode checks | 0.75 h | Done | Gameplay scene validates cleanly, 14/14 EditMode tests pass, and the iterated loop works from a clean open |
 | M6.2 | Test camera, input, grapple misses, falling recovery, death, and restart edge cases | 1.0 h | Done | Five unique seeds reset all run state; miss/retrieval, attach/release, flood death, restart, camera bounds, and cursor lock pass without runtime console issues |
-| M6.3 | Create and run a standalone Windows build | 0.75 h | Planned | Build launches and completes a full run outside the Editor |
+| M6.3 | Create and run a standalone Windows build | 0.75 h | In progress | Clean Windows x64 build `Skyhook Ascent` 1.0.0 succeeds with zero errors and launches responsively; one player-controlled loop remains to confirm |
 | M6.4 | Record honest known limitations and freeze scope | 0.5 h | Planned | `game-design.md` matches the actual build |
 | M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Planned | Gameplay is at most 7 minutes; project ZIP excludes `Library` |
 
@@ -180,8 +180,9 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Begin **M6.3**: create a clean Windows build with `Gameplay` as the only enabled
-scene, launch it outside the Editor, and verify one complete climb/death/restart
-loop. Build Settings previously referenced the unused `SampleScene`; QA replaced
-it with `Assets/Game/Scenes/Gameplay.unity` at build index 0. Fix build blockers
-only and keep the feature set frozen.
+Finish **M6.3** in the open standalone player: move and jump, complete one
+grapple, retrieve one miss, let the flood end the run, and press `R` to confirm
+a new tower starts. The clean Windows x64 build contains 182 files (97.8 MB),
+launches `Gameplay` as `Skyhook Ascent` 1.0.0, remains responsive, and has no
+game-code startup errors. After that confirmation, mark the build accepted and
+begin **M6.4** documentation cleanup; keep the feature set frozen.
