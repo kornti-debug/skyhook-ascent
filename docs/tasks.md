@@ -144,6 +144,8 @@ third-party assets. Explicit hazard warning and any particles remain unfinished.
 The flood now matches the circular shell and uses a lightweight animated URP
 water shader. Consecutive stage shells meet at measured non-overlapping seams,
 removing the material flicker seen during biome transitions.
+The start floor now uses the same centered circular footprint while preserving
+its original surface and player spawn heights.
 
 ## M6 - Submission Candidate
 

@@ -94,6 +94,9 @@ Not included in the MVP:
   shell. A lightweight project-owned URP shader adds animated wave displacement,
   moving highlights, depth color, and restrained transparency without changing
   the gameplay collision height.
+- The masonry starting platform shares the flood and tower shell's circular
+  20-metre footprint. Its surface remains at world height zero so the player
+  spawn and first movement beat are unchanged.
 - Touching the hazard ends the run.
 - There are no enemies in the MVP.
 
