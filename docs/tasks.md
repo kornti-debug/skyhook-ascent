@@ -131,7 +131,7 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 | M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Done | Every anchor has a camera-facing emissive diamond; in-range anchors pulse while the original hit collider remains unchanged |
 | M5.3 | Improve rope/projectile/hit/release feedback | 0.75 h | Done | Outbound, retrieval, pull, hit, and release have distinct color, width, pulse, trail, and anchor-flash cues without HUD text |
 | M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | Done | Lighting/fog preserve route contrast; a pulsing edge frame and numeric clearance warn inside six metres without particles |
-| M5.5 | Polish HUD and optional minimal audio if time remains | 0.5 h | Planned | UI is legible; audio is never required for understanding |
+| M5.5 | Polish HUD and optional minimal audio if time remains | 0.5 h | Done | A compact status card, fading objective/controls card, flood warning, and clear run-end panel explain the complete loop without audio |
 
 No imported asset or audio is added without recording its license/source.
 
@@ -148,6 +148,10 @@ water shader. Consecutive stage shells meet at measured non-overlapping seams,
 removing the material flicker seen during biome transitions.
 The start floor now uses the same centered circular footprint while preserving
 its original surface and player spawn heights.
+The final HUD uses project-owned IMGUI presentation with no additional package:
+it introduces the climb/flood objective and controls for five seconds, then
+leaves a compact height, best, stage, flood-speed, seed, and restart card. Audio
+is intentionally omitted because every required state is already visual.
 
 ## M6 - Submission Candidate
 
@@ -175,9 +179,8 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Play one normal stage and confirm that the flood warning appears late enough to
-preserve a clear view but early enough to prompt an escape. Then complete
-**M5.5** with a focused HUD readability pass; skip audio unless the otherwise
-finished build clearly needs it. Keep the current capsule player and defer
-imported character, animation, footsteps, and a menu until submission checks
-are complete.
+Begin **M6.1-M6.2**: reopen the project cleanly, run the EditMode tests, and
+manually verify movement, camera, successful and missed grapples, flood warning,
+death, and repeated `R` restarts across several seeds. Record any honest known
+limitations and fix blockers only; M5 is feature-frozen and no menu, audio,
+character, or additional mechanics should be added before the standalone build.

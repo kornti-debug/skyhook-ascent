@@ -237,12 +237,22 @@ Required HUD:
 - Hazard proximity or clear visual warning
 - Grapple readiness/return state if it is not obvious from animation
 - Current flood speed
+- Current stage, reproducible run seed, and the `R` restart shortcut
+
+Each run opens with a five-second, automatically fading objective card:
+`CLIMB. ESCAPE THE FLOOD.` It explains that the player must reach higher
+platforms before the water catches them and shows the movement, jump, aim, and
+grapple controls. It does not pause or delay the run.
 
 Required run-end UI:
 
 - Maximum height
 - Seed
 - Restart
+
+The final HUD uses one compact top-left information card, a temporary centered
+objective card, the proximity warning, and a centered run-end panel. Audio and
+a separate menu remain optional scope cuts.
 
 The authored fallback still contains a round goal platform for regression
 testing, but generated play is endless and has no normal finish. Flood contact

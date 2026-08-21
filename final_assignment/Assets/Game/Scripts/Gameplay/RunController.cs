@@ -25,6 +25,10 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Range(0f, 0.5f)] private float maximumWarningAlpha = 0.28f;
         [SerializeField, Min(1f)] private float maximumWarningBorderWidth = 38f;
 
+        [Header("HUD")]
+        [SerializeField, Min(0.5f)] private float runIntroDuration = 5f;
+        [SerializeField, Min(0.1f)] private float runIntroFadeDuration = 1.25f;
+
         private InputAction restartAction;
         private PlayerController playerController;
         private GrappleController grappleController;
@@ -35,6 +39,7 @@ namespace SkyhookAscent.Gameplay
         private float bestHeight;
         private float runHeight;
         private float floodClearance = float.PositiveInfinity;
+        private float runStartedAt;
         private string resultTitle;
         private bool runEnded;
 
@@ -183,6 +188,7 @@ namespace SkyhookAscent.Gameplay
             resultTitle = string.Empty;
             runHeight = 0f;
             floodClearance = float.PositiveInfinity;
+            runStartedAt = Time.unscaledTime;
 
             if (player != null)
             {
@@ -248,56 +254,192 @@ namespace SkyhookAscent.Gameplay
         {
             float scale = Mathf.Max(0.8f, Screen.height / 900f);
             DrawFloodWarning(scale);
+            DrawRunHud(scale);
 
-            GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
+            if (!runEnded)
             {
-                fontSize = Mathf.RoundToInt(22f * scale),
+                DrawRunIntro(scale);
+                return;
+            }
+
+            DrawRunEndPanel(scale);
+        }
+
+        private void DrawRunHud(float scale)
+        {
+            float margin = 18f * scale;
+            Rect panel = new Rect(
+                margin,
+                margin,
+                306f * scale,
+                158f * scale);
+            DrawFilledRect(panel, new Color(0.015f, 0.035f, 0.065f, 0.82f));
+            DrawFilledRect(
+                new Rect(panel.x, panel.y, 5f * scale, panel.height),
+                new Color(0.06f, 0.78f, 1f, 0.95f));
+
+            GUIStyle captionStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(13f * scale),
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.45f, 0.86f, 1f, 1f) }
+            };
+            GUIStyle heightStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(30f * scale),
                 fontStyle = FontStyle.Bold,
                 normal = { textColor = Color.white }
             };
+            GUIStyle detailStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(16f * scale),
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.88f, 0.93f, 1f, 1f) }
+            };
+            GUIStyle seedStyle = new GUIStyle(detailStyle)
+            {
+                fontSize = Mathf.RoundToInt(13f * scale),
+                normal = { textColor = new Color(0.62f, 0.72f, 0.82f, 1f) }
+            };
 
-            GUI.Box(new Rect(20f, 20f, 370f * scale, 176f * scale), string.Empty);
-            GUI.Label(new Rect(36f, 30f, 330f * scale, 30f * scale),
-                $"HEIGHT  {runHeight:0.0} m", labelStyle);
-            GUI.Label(new Rect(36f, 62f, 330f * scale, 30f * scale),
-                $"BEST      {bestHeight:0.0} m", labelStyle);
-            GUI.Label(new Rect(36f, 94f, 330f * scale, 30f * scale),
-                $"SEED  {displayedSeed}", labelStyle);
-            GUI.Label(new Rect(36f, 126f, 330f * scale, 30f * scale),
-                $"STAGE  {(hazard != null ? hazard.CurrentStage + 1 : 1)}", labelStyle);
-            GUI.Label(new Rect(36f, 158f, 330f * scale, 30f * scale),
-                $"FLOOD  {(hazard != null ? hazard.CurrentSpeed : 0f):0.00} m/s", labelStyle);
+            float contentX = panel.x + 18f * scale;
+            float contentWidth = panel.width - 32f * scale;
+            GUI.Label(
+                new Rect(contentX, panel.y + 8f * scale, contentWidth, 20f * scale),
+                "SKYHOOK ASCENT  /  HEIGHT",
+                captionStyle);
+            GUI.Label(
+                new Rect(contentX, panel.y + 28f * scale, contentWidth, 42f * scale),
+                $"{runHeight:0.0} m",
+                heightStyle);
+            GUI.Label(
+                new Rect(contentX, panel.y + 72f * scale, contentWidth, 24f * scale),
+                $"BEST  {bestHeight:0.0} m        STAGE  {(hazard != null ? hazard.CurrentStage + 1 : 1)}",
+                detailStyle);
+            GUI.Label(
+                new Rect(contentX, panel.y + 99f * scale, contentWidth, 24f * scale),
+                $"FLOOD SPEED  {(hazard != null ? hazard.CurrentSpeed : 0f):0.00} m/s",
+                detailStyle);
+            GUI.Label(
+                new Rect(contentX, panel.y + 128f * scale, contentWidth, 20f * scale),
+                $"SEED {displayedSeed}   |   R  NEW TOWER",
+                seedStyle);
+        }
 
-            if (!runEnded)
+        private void DrawRunIntro(float scale)
+        {
+            float elapsed = Time.unscaledTime - runStartedAt;
+            if (elapsed >= runIntroDuration)
             {
                 return;
             }
 
-            float panelWidth = 480f * scale;
-            float panelHeight = 230f * scale;
+            float fadeStart = Mathf.Max(0f, runIntroDuration - runIntroFadeDuration);
+            float alpha = elapsed <= fadeStart
+                ? 1f
+                : 1f - Mathf.InverseLerp(fadeStart, runIntroDuration, elapsed);
+            float panelWidth = Mathf.Min(510f * scale, Screen.width - 32f * scale);
+            float panelHeight = 142f * scale;
+            Rect panel = new Rect(
+                (Screen.width - panelWidth) * 0.5f,
+                Screen.height * 0.28f,
+                panelWidth,
+                panelHeight);
+            DrawFilledRect(panel, new Color(0.01f, 0.025f, 0.05f, 0.86f * alpha));
+            DrawFilledRect(
+                new Rect(panel.x, panel.y, panel.width, 4f * scale),
+                new Color(0.06f, 0.82f, 1f, alpha));
+
+            GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(27f * scale),
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(1f, 1f, 1f, alpha) }
+            };
+            GUIStyle messageStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(15f * scale),
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(0.78f, 0.9f, 1f, alpha) }
+            };
+            GUIStyle controlsStyle = new GUIStyle(messageStyle)
+            {
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.9f, 0.94f, 1f, alpha) }
+            };
+
+            GUI.Label(
+                new Rect(panel.x, panel.y + 10f * scale, panel.width, 38f * scale),
+                "CLIMB. ESCAPE THE FLOOD.",
+                titleStyle);
+            GUI.Label(
+                new Rect(panel.x, panel.y + 49f * scale, panel.width, 25f * scale),
+                "Reach higher platforms before the water catches you.",
+                messageStyle);
+            GUI.Label(
+                new Rect(panel.x, panel.y + 82f * scale, panel.width, 27f * scale),
+                "WASD  MOVE   |   SPACE  JUMP",
+                controlsStyle);
+            GUI.Label(
+                new Rect(panel.x, panel.y + 108f * scale, panel.width, 27f * scale),
+                "MOUSE  AIM   |   LMB  GRAPPLE",
+                controlsStyle);
+        }
+
+        private void DrawRunEndPanel(float scale)
+        {
+            float panelWidth = Mathf.Min(500f * scale, Screen.width - 36f * scale);
+            float panelHeight = 244f * scale;
             Rect panel = new Rect(
                 (Screen.width - panelWidth) * 0.5f,
                 (Screen.height - panelHeight) * 0.5f,
                 panelWidth,
                 panelHeight);
-            GUI.Box(panel, string.Empty);
+            Color accentColor = resultTitle == "TOWER CLEARED"
+                ? new Color(0.3f, 1f, 0.65f, 1f)
+                : new Color(1f, 0.25f, 0.08f, 1f);
+            DrawFilledRect(panel, new Color(0.01f, 0.025f, 0.05f, 0.94f));
+            DrawFilledRect(
+                new Rect(panel.x, panel.y, panel.width, 5f * scale),
+                accentColor);
 
-            GUIStyle titleStyle = new GUIStyle(labelStyle)
+            GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = Mathf.RoundToInt(32f * scale),
-                alignment = TextAnchor.MiddleCenter
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = accentColor }
             };
-            GUIStyle centerStyle = new GUIStyle(labelStyle)
+            GUIStyle resultStyle = new GUIStyle(GUI.skin.label)
             {
-                alignment = TextAnchor.MiddleCenter
+                fontSize = Mathf.RoundToInt(19f * scale),
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
+            };
+            GUIStyle restartStyle = new GUIStyle(resultStyle)
+            {
+                fontSize = Mathf.RoundToInt(21f * scale),
+                normal = { textColor = new Color(0.45f, 0.86f, 1f, 1f) }
             };
 
-            GUI.Label(new Rect(panel.x, panel.y + 22f * scale, panel.width, 55f * scale),
+            GUI.Label(new Rect(panel.x, panel.y + 26f * scale, panel.width, 52f * scale),
                 resultTitle, titleStyle);
-            GUI.Label(new Rect(panel.x, panel.y + 88f * scale, panel.width, 40f * scale),
-                $"Height: {runHeight:0.0} m    Best: {bestHeight:0.0} m", centerStyle);
-            GUI.Label(new Rect(panel.x, panel.y + 144f * scale, panel.width, 45f * scale),
-                "R  New Tower", centerStyle);
+            GUI.Label(new Rect(panel.x, panel.y + 94f * scale, panel.width, 32f * scale),
+                $"RUN HEIGHT  {runHeight:0.0} m", resultStyle);
+            GUI.Label(new Rect(panel.x, panel.y + 128f * scale, panel.width, 32f * scale),
+                $"SESSION BEST  {bestHeight:0.0} m", resultStyle);
+            GUI.Label(new Rect(panel.x, panel.y + 184f * scale, panel.width, 36f * scale),
+                "R  START A NEW TOWER", restartStyle);
+        }
+
+        private static void DrawFilledRect(Rect rect, Color color)
+        {
+            Color previousColor = GUI.color;
+            GUI.color = color;
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = previousColor;
         }
 
         private void DrawFloodWarning(float scale)
@@ -380,6 +522,11 @@ namespace SkyhookAscent.Gameplay
                 floodWarningDistance);
             maximumWarningAlpha = Mathf.Clamp(maximumWarningAlpha, 0f, 0.5f);
             maximumWarningBorderWidth = Mathf.Max(1f, maximumWarningBorderWidth);
+            runIntroDuration = Mathf.Max(0.5f, runIntroDuration);
+            runIntroFadeDuration = Mathf.Clamp(
+                runIntroFadeDuration,
+                0.1f,
+                runIntroDuration);
         }
     }
 }
