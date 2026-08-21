@@ -258,7 +258,8 @@ a separate menu remain optional scope cuts.
 The authored fallback still contains a round goal platform for regression
 testing, but generated play is endless and has no normal finish. Flood contact
 ends the run. `R` cancels any active grapple, creates a fresh seeded tower, and
-returns the player, hazard, score, grapple, and camera state to the start.
+returns the player, hazard, score, and grapple state to the start. The camera
+follows the reset player while preserving the player's current aim orientation.
 
 In the Unity Editor only, `F3` toggles collision-free debug flight for streaming
 and geometry inspection. Use `WASD` to move, `Space`/`E` to rise,
@@ -355,3 +356,5 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
   run, but its ballistic aim and landing feel still need a normal player
   traversal check before the submission build is frozen.
 - Roguelike upgrades are not implemented and remain outside the current MVP.
+- The submission target is keyboard and mouse on Windows. Gamepad behavior is
+  not part of the graded test target.

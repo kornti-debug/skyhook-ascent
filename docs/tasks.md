@@ -160,8 +160,8 @@ Goal: freeze features and prove the project can be graded reliably.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M6.1 | Run focused EditMode tests and manual Play Mode checks | 0.75 h | Planned | Rules pass and the complete loop works from a clean open |
-| M6.2 | Test camera, input, grapple misses, falling recovery, death, and restart edge cases | 1.0 h | Planned | No known blocker remains hidden |
+| M6.1 | Run focused EditMode tests and manual Play Mode checks | 0.75 h | Done | Gameplay scene validates cleanly, 14/14 EditMode tests pass, and the iterated loop works from a clean open |
+| M6.2 | Test camera, input, grapple misses, falling recovery, death, and restart edge cases | 1.0 h | Done | Five unique seeds reset all run state; miss/retrieval, attach/release, flood death, restart, camera bounds, and cursor lock pass without runtime console issues |
 | M6.3 | Create and run a standalone Windows build | 0.75 h | Planned | Build launches and completes a full run outside the Editor |
 | M6.4 | Record honest known limitations and freeze scope | 0.5 h | Planned | `game-design.md` matches the actual build |
 | M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Planned | Gameplay is at most 7 minutes; project ZIP excludes `Library` |
@@ -180,8 +180,8 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Begin **M6.1-M6.2**: reopen the project cleanly, run the EditMode tests, and
-manually verify movement, camera, successful and missed grapples, flood warning,
-death, and repeated `R` restarts across several seeds. Record any honest known
-limitations and fix blockers only; M5 is feature-frozen and no menu, audio,
-character, or additional mechanics should be added before the standalone build.
+Begin **M6.3**: create a clean Windows build with `Gameplay` as the only enabled
+scene, launch it outside the Editor, and verify one complete climb/death/restart
+loop. Build Settings previously referenced the unused `SampleScene`; QA replaced
+it with `Assets/Game/Scenes/Gameplay.unity` at build index 0. Fix build blockers
+only and keep the feature set frozen.
