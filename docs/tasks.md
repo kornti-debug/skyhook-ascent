@@ -162,9 +162,9 @@ Goal: freeze features and prove the project can be graded reliably.
 | --- | --- | ---: | --- | --- |
 | M6.1 | Run focused EditMode tests and manual Play Mode checks | 0.75 h | Done | Gameplay scene validates cleanly, 14/14 EditMode tests pass, and the iterated loop works from a clean open |
 | M6.2 | Test camera, input, grapple misses, falling recovery, death, and restart edge cases | 1.0 h | Done | Five unique seeds reset all run state; miss/retrieval, attach/release, flood death, restart, camera bounds, and cursor lock pass without runtime console issues |
-| M6.3 | Create and run a standalone Windows build | 0.75 h | In progress | Clean Windows x64 build `Skyhook Ascent` 1.0.0 succeeds with zero errors and launches responsively; one player-controlled loop remains to confirm |
-| M6.4 | Record honest known limitations and freeze scope | 0.5 h | Planned | `game-design.md` matches the actual build |
-| M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Planned | Gameplay is at most 7 minutes; project ZIP excludes `Library` |
+| M6.3 | Create and run a standalone Windows build | 0.75 h | Done | Clean Windows x64 build `Skyhook Ascent` 1.0.0 succeeds with zero errors; move, jump, grapple hit/miss, flood death, and `R` restart were manually confirmed |
+| M6.4 | Record honest known limitations and freeze scope | 0.5 h | Done | README, checklist, and `game-design.md` match the accepted build; no further gameplay features are planned |
+| M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Next | Gameplay is at most 7 minutes; project ZIP excludes `Library` |
 
 ## Stretch backlog
 
@@ -180,9 +180,8 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Finish **M6.3** in the open standalone player: move and jump, complete one
-grapple, retrieve one miss, let the flood end the run, and press `R` to confirm
-a new tower starts. The clean Windows x64 build contains 182 files (97.8 MB),
-launches `Gameplay` as `Skyhook Ascent` 1.0.0, remains responsive, and has no
-game-code startup errors. After that confirmation, mark the build accepted and
-begin **M6.4** documentation cleanup; keep the feature set frozen.
+Begin **M6.5** with a short audio/screen test, then record the 15-25 minute video
+using [`video-plan.md`](video-plan.md). Keep the gameplay demonstration below
+seven minutes. After reviewing the recording, create the Unity project ZIP from
+`final_assignment/` without `Library`, generated build output, temporary folders,
+or local-only files, then download and test both final submission artifacts.

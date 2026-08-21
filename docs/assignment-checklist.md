@@ -33,10 +33,10 @@ The PDF metadata is dated June 25, 2025. Confirm the applicable year and submiss
 
 ### Upload 2: Unity project
 
-- [ ] Project opens with Unity `6000.3.6f1`
-- [ ] Project compiles with no project errors
-- [ ] Main gameplay loop is playable from a clean open
-- [ ] Only licensed/redistributable assets are included
+- [x] Project opens with Unity `6000.3.6f1`
+- [x] Project compiles with no project errors
+- [x] Main gameplay loop is playable from a clean open
+- [x] Only licensed/redistributable assets are included
 - [ ] `Library` is excluded before creating the ZIP
 - [ ] Upload the ZIP directly, or provide a stable accessible download link in a `.txt` file
 - [ ] The final ZIP/link is downloaded once and tested
@@ -81,10 +81,9 @@ For procedural visuals or shaders, parameters must be controlled through the gam
 
 ## Submission-day check
 
-- [ ] Known limitations are documented and can be explained honestly
-- [ ] No secrets, personal paths, temporary captures, or agent files are included
+- [x] Known limitations are documented and can be explained honestly
+- [x] No secrets, personal paths, temporary captures, or agent files are included in source control
 - [ ] Video duration is checked
 - [ ] Gameplay portion is at most 7 minutes
 - [ ] Both uploads are accessible
 - [ ] Backup copies of the project ZIP and video are kept
-

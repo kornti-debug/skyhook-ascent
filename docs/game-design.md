@@ -328,33 +328,19 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - Camera shake must remain subtle and optional if implemented.
 - Hazard warnings must be visible without relying on audio.
 
-## Known risks
+## Known limitations and residual risks
 
-- Zip speed, arrival distance, and anchor placement may consume more tuning time than expected.
-- A real projectile can miss thin targets at speed; collision handling must be robust.
-- A blocked path to an anchor must time out without trapping the player in the pulling state.
-- Grapple-state colors supplement motion and thickness changes; gameplay does
-  not depend on color perception alone.
-- Flood danger uses text, pulsing intensity, and edge width in addition to its
-  cyan-to-orange color shift.
-- Camera collision inside the cylindrical tower needs early testing.
-- Generated chunk rotation can create visual intersections even when traversal remains valid.
-- Rising hazard speed must pressure the player without making safe routes pointless.
-- Structural generation is automated, but each accepted seed still needs a human traversal play-test.
-- The six derived variants reuse validated primitives, but their changed gaps
-  and rhythm require manual base-ability validation before they are considered
-  submission-safe.
-- Clearance validation uses a conservative sampled corridor rather than an
-  exact simulation of every possible ballistic aiming arc. It prevents known
-  platform obstructions but does not replace manual traversal testing.
-- Cleanup destroys submerged chunks instead of pooling them. This is adequate
-  for the assignment but creates more runtime allocations than a production pool.
-- The transition landing, three stage palettes, and recycled structural tower
-  shell have a coherent color, lighting, and fog pass. Their final traversal
-  readability still needs a human play-test from the normal gameplay camera.
-- The raised zip transition passed an automated eight-stage generation stress
-  run, but its ballistic aim and landing feel still need a normal player
-  traversal check before the submission build is frozen.
-- Roguelike upgrades are not implemented and remain outside the current MVP.
-- The submission target is keyboard and mouse on Windows. Gamepad behavior is
-  not part of the graded test target.
+- Generation uses structural overlap, headroom, and sampled grapple-corridor
+  validation rather than simulating every possible ballistic shot. Stress tests
+  and manual traversal passed, but a rare awkward route may still be possible;
+  the displayed seed makes it reproducible.
+- Distant visible anchors can sometimes be hit to skip intermediate platforms.
+  This is accepted as an intentional high-risk, time-saving skill shot.
+- Submerged chunks are destroyed rather than pooled. This is sufficient for the
+  assignment scale but creates more allocations than a production pooling system.
+- The best-height value lasts only for the current application session.
+- The graded target is keyboard and mouse on Windows. Gamepad, other operating
+  systems, unusual aspect ratios, and other hardware have not been fully tested.
+- Audio, a main menu, character animation, upgrades, collectibles, and persistent
+  progression are deliberate scope cuts. The complete loop communicates required
+  state through motion, shape, text, and visual feedback without them.

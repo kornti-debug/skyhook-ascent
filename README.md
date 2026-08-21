@@ -6,15 +6,17 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 
 ## Current status
 
-- Assignment requirements reviewed.
-- Unity 6 URP project created with the Input System.
-- Game concept locked: a procedural vertical 3D grappling platformer (working title: **Skyhook Ascent**).
-- Lightweight architecture selected; the reusable blueprint will not be copied wholesale.
-- MCP for Unity is connected and verified as editor-only development tooling.
-- Initial GitHub baseline created and pushed.
-- Movement playground scene created and verified.
-- Gameplay input map created and verified.
-- Next task: **M1.3**, player movement and grounded jumping.
+- The feature set is frozen as a submission candidate.
+- **Skyhook Ascent** is a playable endless vertical 3D platformer with responsive
+  movement, a ballistic skill-shot zip grapple, deterministic procedural stages,
+  an accelerating flood hazard, restart/death flow, and a compact HUD.
+- The presentation uses project-owned procedural textures, URP materials, a
+  cylindrical tower shell, animated water, fog, lighting, and visual grapple and
+  danger feedback. No third-party art or audio is required.
+- Unity compiles without project errors and all 14 focused EditMode tests pass.
+- A Windows x64 build (`Skyhook Ascent` 1.0.0) has been built and its complete
+  move/jump/grapple/miss/death/restart loop has been manually verified.
+- Next task: **M6.5**, record the explanatory video and prepare the final project ZIP.
 
 ## Start here
 
@@ -49,7 +51,20 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 - Editor: Unity `6000.3.6f1`
 - Render pipeline: URP `17.3.0`
 - Input: Input System `1.18.0`
-- Main project assets will live under `Assets/Game/`
+- Project-owned assets live under `Assets/Game/`
 - Unity MCP is development tooling only and must never become a runtime dependency
+
+## Controls
+
+- `WASD` - move
+- `Left Shift` - run
+- `Space` - jump
+- Mouse - aim
+- Left mouse button - fire the grapple
+- `R` - restart with a newly generated tower
+
+The local Windows build is generated under `final_assignment/Builds/Windows/`.
+Build output is intentionally ignored by Git; the repository contains the Unity
+source project and documentation.
 
 Before submitting a ZIP, close Unity and remove the Unity project's `Library` folder from the copy being uploaded.
