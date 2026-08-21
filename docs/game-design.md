@@ -178,6 +178,10 @@ are then removed.
   within a stage. Prototype tuning starts at 0.65 m/s, adds 0.20 m/s per stage
   plus up to 0.10 m/s within the current stage, and caps the total additional
   speed at 2.0 m/s.
+- When the flood comes within six metres of its contact boundary, a pulsing
+  screen-edge frame and a numeric `FLOOD CLOSE` clearance warning appear. The
+  frame grows stronger and changes from cyan toward orange/red inside the
+  final 2.5 metres, while the normal view remains clear at safe distances.
 - Stage geometry and materials must not change the reachability rules.
 
 Every chunk must be tested with base movement and grapple values. Upgrades may make routes easier or unlock optional shortcuts, but required progression never depends on an upgrade.
@@ -319,6 +323,8 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - A blocked path to an anchor must time out without trapping the player in the pulling state.
 - Grapple-state colors supplement motion and thickness changes; gameplay does
   not depend on color perception alone.
+- Flood danger uses text, pulsing intensity, and edge width in addition to its
+  cyan-to-orange color shift.
 - Camera collision inside the cylindrical tower needs early testing.
 - Generated chunk rotation can create visual intersections even when traversal remains valid.
 - Rising hazard speed must pressure the player without making safe routes pointless.

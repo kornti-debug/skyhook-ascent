@@ -130,7 +130,7 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 | M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | Done | Three textured stage palettes cycle with matching collider-free wall shells; the hazard and background remain visually distinct |
 | M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Done | Every anchor has a camera-facing emissive diamond; in-range anchors pulse while the original hit collider remains unchanged |
 | M5.3 | Improve rope/projectile/hit/release feedback | 0.75 h | Done | Outbound, retrieval, pull, hit, and release have distinct color, width, pulse, trail, and anchor-flash cues without HUD text |
-| M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | In progress | The route remains readable from the gameplay camera |
+| M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | Done | Lighting/fog preserve route contrast; a pulsing edge frame and numeric clearance warn inside six metres without particles |
 | M5.5 | Polish HUD and optional minimal audio if time remains | 0.5 h | Planned | UI is legible; audio is never required for understanding |
 
 No imported asset or audio is added without recording its license/source.
@@ -140,7 +140,9 @@ URP materials for masonry, ice, and overgrown-wood stages. Each generated stage
 also receives a matching 16-panel, 20-metre-radius collider-free tower shell; the
 shell is recycled with its stage. The start floor, deep-blue background,
 restrained ambient light, and distance fog keep the route readable without
-third-party assets. Explicit hazard warning and any particles remain unfinished.
+third-party assets. Flood proximity now adds a non-color-only edge and distance
+warning only inside its six-metre danger zone; particles remain intentionally
+omitted because the warning is already clear.
 The flood now matches the circular shell and uses a lightweight animated URP
 water shader. Consecutive stage shells meet at measured non-overlapping seams,
 removing the material flicker seen during biome transitions.
@@ -173,9 +175,9 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Play one normal stage and confirm that outbound, retrieval, attached pull, and
-release states are readable during real movement. Then finish **M5.4** with one
-clear visual flood-proximity warning; avoid particles unless the warning still
-needs support. Keep the current capsule player and defer imported character,
-animation, footsteps, menu, and optional audio until required feedback and
-submission checks are complete.
+Play one normal stage and confirm that the flood warning appears late enough to
+preserve a clear view but early enough to prompt an escape. Then complete
+**M5.5** with a focused HUD readability pass; skip audio unless the otherwise
+finished build clearly needs it. Keep the current capsule player and defer
+imported character, animation, footsteps, and a menu until submission checks
+are complete.

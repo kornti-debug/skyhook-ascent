@@ -19,6 +19,12 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(0f)] private float hazardContactMargin = 0.85f;
         [SerializeField] private int displayedSeed = 104729;
 
+        [Header("Flood Warning")]
+        [SerializeField, Min(0.1f)] private float floodWarningDistance = 6f;
+        [SerializeField, Min(0.1f)] private float floodCriticalDistance = 2.5f;
+        [SerializeField, Range(0f, 0.5f)] private float maximumWarningAlpha = 0.28f;
+        [SerializeField, Min(1f)] private float maximumWarningBorderWidth = 38f;
+
         private InputAction restartAction;
         private PlayerController playerController;
         private GrappleController grappleController;
@@ -28,12 +34,14 @@ namespace SkyhookAscent.Gameplay
         private Quaternion playerStartRotation;
         private float bestHeight;
         private float runHeight;
+        private float floodClearance = float.PositiveInfinity;
         private string resultTitle;
         private bool runEnded;
 
         public bool RunEnded => runEnded;
         public float CurrentHeight => runHeight;
         public float BestHeight => bestHeight;
+        public float FloodClearance => floodClearance;
 
         public void ConfigureCourse(Transform courseFinish, int seed)
         {
@@ -136,7 +144,9 @@ namespace SkyhookAscent.Gameplay
                 hazard.ReportPlayerHeight(runHeight);
             }
 
-            if (player.position.y <= hazard.SurfaceHeight + hazardContactMargin)
+            floodClearance = player.position.y -
+                (hazard.SurfaceHeight + hazardContactMargin);
+            if (floodClearance <= 0f)
             {
                 EndRun("THE FLOOD CAUGHT YOU", freezePlayer: false);
             }
@@ -172,6 +182,7 @@ namespace SkyhookAscent.Gameplay
             runEnded = false;
             resultTitle = string.Empty;
             runHeight = 0f;
+            floodClearance = float.PositiveInfinity;
 
             if (player != null)
             {
@@ -236,6 +247,8 @@ namespace SkyhookAscent.Gameplay
         private void OnGUI()
         {
             float scale = Mathf.Max(0.8f, Screen.height / 900f);
+            DrawFloodWarning(scale);
+
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = Mathf.RoundToInt(22f * scale),
@@ -287,9 +300,86 @@ namespace SkyhookAscent.Gameplay
                 "R  New Tower", centerStyle);
         }
 
+        private void DrawFloodWarning(float scale)
+        {
+            if (runEnded || !float.IsFinite(floodClearance))
+            {
+                return;
+            }
+
+            float warningStrength = FloodWarningRules.CalculateStrength(
+                floodClearance,
+                floodWarningDistance);
+            if (warningStrength <= 0f)
+            {
+                return;
+            }
+
+            float criticalStrength = FloodWarningRules.CalculateCriticalStrength(
+                floodClearance,
+                floodCriticalDistance);
+            float pulseSpeed = Mathf.Lerp(3.5f, 8f, criticalStrength);
+            float pulse = 0.82f +
+                (Mathf.Sin(Time.unscaledTime * pulseSpeed) * 0.5f + 0.5f) * 0.28f;
+            float alpha = Mathf.Clamp01(
+                maximumWarningAlpha * warningStrength * pulse);
+            float borderWidth = Mathf.Lerp(
+                8f,
+                maximumWarningBorderWidth,
+                warningStrength) * scale;
+            Color warningColor = Color.Lerp(
+                new Color(0.05f, 0.72f, 1f, alpha),
+                new Color(1f, 0.16f, 0.05f, alpha),
+                criticalStrength);
+
+            Color previousColor = GUI.color;
+            GUI.color = warningColor;
+            GUI.DrawTexture(
+                new Rect(0f, 0f, Screen.width, borderWidth),
+                Texture2D.whiteTexture);
+            GUI.DrawTexture(
+                new Rect(0f, Screen.height - borderWidth, Screen.width, borderWidth),
+                Texture2D.whiteTexture);
+            GUI.DrawTexture(
+                new Rect(0f, borderWidth, borderWidth, Screen.height - borderWidth * 2f),
+                Texture2D.whiteTexture);
+            GUI.DrawTexture(
+                new Rect(
+                    Screen.width - borderWidth,
+                    borderWidth,
+                    borderWidth,
+                    Screen.height - borderWidth * 2f),
+                Texture2D.whiteTexture);
+            GUI.color = previousColor;
+
+            GUIStyle warningStyle = new GUIStyle(GUI.skin.box)
+            {
+                fontSize = Mathf.RoundToInt(20f * scale),
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
+            };
+            float labelWidth = 310f * scale;
+            GUI.Box(
+                new Rect(
+                    (Screen.width - labelWidth) * 0.5f,
+                    22f * scale,
+                    labelWidth,
+                    42f * scale),
+                $"FLOOD CLOSE  {Mathf.Max(0f, floodClearance):0.0} m",
+                warningStyle);
+        }
+
         private void OnValidate()
         {
             hazardContactMargin = Mathf.Max(0f, hazardContactMargin);
+            floodWarningDistance = Mathf.Max(0.1f, floodWarningDistance);
+            floodCriticalDistance = Mathf.Clamp(
+                floodCriticalDistance,
+                0.1f,
+                floodWarningDistance);
+            maximumWarningAlpha = Mathf.Clamp(maximumWarningAlpha, 0f, 0.5f);
+            maximumWarningBorderWidth = Mathf.Max(1f, maximumWarningBorderWidth);
         }
     }
 }

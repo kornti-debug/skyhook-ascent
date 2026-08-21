@@ -7,6 +7,20 @@ namespace SkyhookAscent.Tests
 {
     public sealed class ChunkSelectionRulesTests
     {
+        [Test]
+        public void FloodWarningStrength_IncreasesAsClearanceCloses()
+        {
+            Assert.That(
+                FloodWarningRules.CalculateStrength(8f, 6f),
+                Is.EqualTo(0f));
+            Assert.That(
+                FloodWarningRules.CalculateStrength(3f, 6f),
+                Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(
+                FloodWarningRules.CalculateStrength(0f, 6f),
+                Is.EqualTo(1f));
+        }
+
         private static readonly ChunkCandidate[] Candidates =
         {
             new ChunkCandidate("jumps-a", 1, 2, ChunkTraversalCategory.Jumps),
