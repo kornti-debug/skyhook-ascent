@@ -141,6 +141,9 @@ also receives a matching 16-panel, 20-metre-radius collider-free tower shell; th
 shell is recycled with its stage. The start floor, deep-blue background,
 restrained ambient light, and distance fog keep the route readable without
 third-party assets. Explicit hazard warning and any particles remain unfinished.
+The flood now matches the circular shell and uses a lightweight animated URP
+water shader. Consecutive stage shells meet at measured non-overlapping seams,
+removing the material flicker seen during biome transitions.
 
 ## M6 - Submission Candidate
 

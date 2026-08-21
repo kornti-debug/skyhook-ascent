@@ -10,6 +10,7 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(1f)] private float stageHeight = 100f;
         [SerializeField, Min(0f)] private float stageSpeedIncrease = 0.2f;
         [SerializeField, Min(0f)] private float withinStageSpeedIncrease = 0.1f;
+        [SerializeField] private Renderer surfaceRenderer;
 
         private Vector3 startPosition;
         private float highestPlayerHeight;
@@ -17,13 +18,19 @@ namespace SkyhookAscent.Gameplay
         private int currentStage;
         private bool rising;
 
-        public float SurfaceHeight => transform.position.y + transform.lossyScale.y * 0.5f;
+        public float SurfaceHeight => surfaceRenderer != null
+            ? surfaceRenderer.bounds.max.y
+            : transform.position.y + transform.lossyScale.y * 0.5f;
         public int CurrentStage => currentStage;
         public float CurrentSpeed { get; private set; }
 
         private void Awake()
         {
             startPosition = transform.position;
+            if (surfaceRenderer == null)
+            {
+                surfaceRenderer = GetComponent<Renderer>();
+            }
         }
 
         private void Update()

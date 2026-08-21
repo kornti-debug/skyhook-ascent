@@ -490,6 +490,11 @@ namespace SkyhookAscent.Gameplay
 
         private void CommitAppendedStage(StageBuild build)
         {
+            if (activeStages.Count > 0)
+            {
+                AlignStageShellSeam(activeStages[activeStages.Count - 1], build);
+            }
+
             activeStages.Add(build.ToRecord());
             nextAttachmentPoint = build.NextAttachmentPoint;
             lastPlacedChunk = build.LastChunk;
@@ -925,6 +930,58 @@ namespace SkyhookAscent.Gameplay
             }
 
             return materials[stageIndex % materials.Length];
+        }
+
+        private void AlignStageShellSeam(StageRecord previous, StageBuild next)
+        {
+            if (!generateStageShell || previous == null || next == null)
+            {
+                return;
+            }
+
+            const float seamGap = 0.08f;
+            float seamY = (previous.HighestY + next.LowestY) * 0.5f;
+            SetStageShellBoundary(previous.Root, seamY - seamGap * 0.5f, true);
+            SetStageShellBoundary(next.Root, seamY + seamGap * 0.5f, false);
+        }
+
+        private static void SetStageShellBoundary(
+            Transform stageRoot,
+            float boundaryY,
+            bool setTop)
+        {
+            if (stageRoot == null)
+            {
+                return;
+            }
+
+            Transform shellRoot = stageRoot.Find("VisualShell");
+            if (shellRoot == null)
+            {
+                return;
+            }
+
+            for (int panelIndex = 0; panelIndex < shellRoot.childCount; panelIndex++)
+            {
+                Transform panel = shellRoot.GetChild(panelIndex);
+                float currentHeight = panel.lossyScale.y;
+                float currentBottom = panel.position.y - currentHeight * 0.5f;
+                float currentTop = panel.position.y + currentHeight * 0.5f;
+                float bottom = setTop ? currentBottom : boundaryY;
+                float top = setTop ? boundaryY : currentTop;
+                float height = Mathf.Max(0.1f, top - bottom);
+
+                Vector3 worldPosition = panel.position;
+                worldPosition.y = (bottom + top) * 0.5f;
+                panel.position = worldPosition;
+
+                float parentScaleY = Mathf.Max(
+                    0.0001f,
+                    Mathf.Abs(panel.parent.lossyScale.y));
+                Vector3 localScale = panel.localScale;
+                localScale.y = height / parentScaleY;
+                panel.localScale = localScale;
+            }
         }
 
         private void ApplyStageMaterial(TowerChunk chunk, int stageIndex)

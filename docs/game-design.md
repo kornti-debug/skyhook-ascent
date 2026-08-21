@@ -90,6 +90,10 @@ Not included in the MVP:
 
 - Falling to a lower platform is allowed and can produce a recovery.
 - The rising hazard prevents unlimited retries below the current height.
+- The flood is a circular surface fitted just inside the 20-metre-radius tower
+  shell. A lightweight project-owned URP shader adds animated wave displacement,
+  moving highlights, depth color, and restrained transparency without changing
+  the gameplay collision height.
 - Touching the hazard ends the run.
 - There are no enemies in the MVP.
 
@@ -152,7 +156,9 @@ are then removed.
 - Each stage creates a matching 16-panel tower shell at a 20-metre radius. The
   shell has no colliders or shadows, so it communicates the cylindrical tower
   without changing traversal, blocking grapple shots, or adding unnecessary
-  physics work. It is removed together with its submerged stage.
+  physics work. Adjacent shells are trimmed to a shared seam with a small gap,
+  preventing different stage materials from overlapping and flickering. Each
+  shell is removed together with its submerged stage.
 - The presentation uses project-owned procedural tile textures against a
   dark-blue background. Cool directional light, tri-light ambient color, and
   subtle exponential fog separate the route from distant geometry without
