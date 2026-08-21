@@ -70,6 +70,10 @@ The first prototype may use a capsule and primitives. Character animation is not
 - No target snapping or ballistic compensation; objects under the crosshair do not alter the launch
 - Only objects on the grapple-anchor layer can be attached
 - The hook has a fixed maximum travel range
+- Every anchor has a camera-facing emissive diamond around its original core.
+  Anchors inside the base 22-metre straight-line range brighten and pulse;
+  distant anchors remain smaller and subdued. This is a range/readability cue,
+  not a promise that the ballistic arc is clear and not an aiming aid.
 - A missed hook visibly returns to the player's current position before another shot is available, even while the player moves or falls
 - There is exactly one active hook: firing is blocked while it is flying, returning, or pulling
 - A valid hit automatically pulls the player toward the anchor at a capped speed
@@ -298,7 +302,8 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 ## Accessibility and comfort
 
 - Grapple anchors differ by shape/emission as well as color.
-- Crosshair and anchor highlighting make valid targets readable.
+- The diamond frame and pulse make nearby valid anchors readable without
+  changing the crosshair or snapping the shot.
 - Camera motion should not automatically roll with the player.
 - Camera shake must remain subtle and optional if implemented.
 - Hazard warnings must be visible without relying on audio.

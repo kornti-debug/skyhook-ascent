@@ -128,7 +128,7 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
 | M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | Done | Three textured stage palettes cycle with matching collider-free wall shells; the hazard and background remain visually distinct |
-| M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Planned | Valid anchors are identifiable during motion |
+| M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Done | Every anchor has a camera-facing emissive diamond; in-range anchors pulse while the original hit collider remains unchanged |
 | M5.3 | Improve rope/projectile/hit/release feedback | 0.75 h | Planned | Hook state is understandable without additional HUD text |
 | M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | In progress | The route remains readable from the gameplay camera |
 | M5.5 | Polish HUD and optional minimal audio if time remains | 0.5 h | Planned | UI is legible; audio is never required for understanding |
@@ -173,8 +173,8 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Review the masonry, ice, and overgrown-wood stages from the normal gameplay
-camera, then begin **M5.2** by improving anchor readability without relying on
-color alone. Keep the current capsule player and defer imported character,
-animation, footsteps, menu, and optional audio until the required feedback and
-submission checks are complete.
+Play one normal stage and confirm that nearby pulsing anchors are readable while
+distant anchors remain subdued. Then begin **M5.3** with concise hook-state
+feedback for launch, valid hit, miss/retrieval, and release. Keep the current
+capsule player and defer imported character, animation, footsteps, menu, and
+optional audio until required feedback and submission checks are complete.

@@ -54,6 +54,7 @@ namespace SkyhookAscent.Gameplay
         public bool HasActiveProjectile => activeProjectile != null;
         public bool IsPulling => activeAnchor != null;
         public bool CanFire => grappleEnabled && activeProjectile == null && !IsPulling;
+        public float MaximumRange => maximumRange;
         public Vector3 HookOriginPosition =>
             transform.position + Vector3.up * verticalSpawnOffset;
         public GrappleAnchor LastHitAnchor { get; private set; }
