@@ -148,12 +148,15 @@ are then removed.
   safely above earlier jump surfaces while remaining inside the base grapple
   range. Its placement must preserve the projectile corridor and player-sized
   headroom around the previous route.
-- Platforms receive the material palette of their height stage, such as stone,
-  wood, ice, or overgrown masonry.
-- The first presentation pass uses a restrained slate, ice, and ember palette
-  against a dark-blue background. Cool directional light, tri-light ambient
-  color, and subtle exponential fog separate the route from distant geometry
-  without adding imported art assets.
+- Platforms cycle through masonry, ice, and overgrown-wood material palettes.
+- Each stage creates a matching 16-panel tower shell at a 20-metre radius. The
+  shell has no colliders or shadows, so it communicates the cylindrical tower
+  without changing traversal, blocking grapple shots, or adding unnecessary
+  physics work. It is removed together with its submerged stage.
+- The presentation uses project-owned procedural tile textures against a
+  dark-blue background. Cool directional light, tri-light ambient color, and
+  subtle exponential fog separate the route from distant geometry without
+  imported art assets or third-party licensing requirements.
 - The flood speed increases at each stage boundary and may also rise smoothly
   within a stage. Prototype tuning starts at 0.65 m/s, adds 0.20 m/s per stage
   plus up to 0.10 m/s within the current stage, and caps the total additional
@@ -308,9 +311,9 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
   platform obstructions but does not replace manual traversal testing.
 - Cleanup destroys submerged chunks instead of pooling them. This is adequate
   for the assignment but creates more runtime allocations than a production pool.
-- The transition landing and three stage palettes have a first coherent color,
-  lighting, and fog pass; the structural tower shell and final traversal
-  readability still need a human play-test.
+- The transition landing, three stage palettes, and recycled structural tower
+  shell have a coherent color, lighting, and fog pass. Their final traversal
+  readability still needs a human play-test from the normal gameplay camera.
 - The raised zip transition passed an automated eight-stage generation stress
   run, but its ballistic aim and landing feel still need a normal player
   traversal check before the submission build is frozen.

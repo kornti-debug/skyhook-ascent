@@ -18,6 +18,7 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private TowerChunk transitionChunkPrefab;
         [SerializeField] private TowerChunk[] chunkPrefabs;
         [SerializeField] private Material[] stageMaterials;
+        [SerializeField] private Material[] stageWallMaterials;
         [SerializeField] private Transform finishGoal;
         [SerializeField] private RunController runController;
         [SerializeField] private Transform player;
@@ -37,6 +38,13 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(0.1f)] private float appendRetryDelay = 1f;
         [SerializeField, Min(0f)] private float minimumTransitionRise = 8f;
         [SerializeField, Min(0f)] private float maximumTransitionRise = 9.5f;
+
+        [Header("Stage Presentation")]
+        [SerializeField] private bool generateStageShell = true;
+        [SerializeField, Range(8, 24)] private int shellSegmentCount = 16;
+        [SerializeField, Min(14f)] private float shellRadius = 20f;
+        [SerializeField, Min(0.1f)] private float shellThickness = 0.6f;
+        [SerializeField, Min(0f)] private float shellVerticalPadding = 4f;
 
         [Header("Placement")]
         [SerializeField, Min(5f)] private float maximumHorizontalRadius = 12f;
@@ -438,6 +446,8 @@ namespace SkyhookAscent.Gameplay
                 sequence.Append(placedChunk.ChunkId);
             }
 
+            CreateStageShell(stageRoot, stageIndex, lowestY, highestY);
+
             build = new StageBuild(
                 stageIndex,
                 stageRoot,
@@ -797,7 +807,7 @@ namespace SkyhookAscent.Gameplay
             for (int stageIndex = activeStages.Count - 1; stageIndex >= 0; stageIndex--)
             {
                 StageRecord stage = activeStages[stageIndex];
-                if (stage.Root != null && stage.Root.childCount > 0)
+                if (StageContainsChunks(stage.Root))
                 {
                     continue;
                 }
@@ -813,6 +823,108 @@ namespace SkyhookAscent.Gameplay
                     $"Active stages={activeStages.Count}, chunks={GeneratedChunkTotal}.",
                     this);
             }
+        }
+
+        private static bool StageContainsChunks(Transform stageRoot)
+        {
+            if (stageRoot == null)
+            {
+                return false;
+            }
+
+            for (int childIndex = 0; childIndex < stageRoot.childCount; childIndex++)
+            {
+                GameObject child = stageRoot.GetChild(childIndex).gameObject;
+                if (child.activeSelf && child.GetComponent<TowerChunk>() != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void CreateStageShell(
+            Transform stageRoot,
+            int stageIndex,
+            float lowestY,
+            float highestY)
+        {
+            if (!generateStageShell || stageRoot == null ||
+                float.IsNaN(lowestY) || float.IsInfinity(lowestY) ||
+                float.IsNaN(highestY) || float.IsInfinity(highestY))
+            {
+                return;
+            }
+
+            Material wallMaterial = GetStageWallMaterial(stageIndex);
+            if (wallMaterial == null)
+            {
+                return;
+            }
+
+            int segmentCount = Mathf.Clamp(shellSegmentCount, 8, 24);
+            float height = Mathf.Max(
+                1f,
+                highestY - lowestY + shellVerticalPadding * 2f);
+            float centerY = (lowestY + highestY) * 0.5f;
+            float panelWidth = 2f * Mathf.PI * shellRadius / segmentCount * 0.94f;
+
+            GameObject shellObject = new GameObject("VisualShell");
+            Transform shellRoot = shellObject.transform;
+            shellRoot.SetParent(stageRoot, false);
+
+            for (int segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++)
+            {
+                float angle = segmentIndex * 360f / segmentCount;
+                Vector3 radial = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+                GameObject panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                panel.name = $"Wall_{segmentIndex:00}";
+                panel.transform.SetParent(shellRoot, false);
+                panel.transform.position = new Vector3(
+                    radial.x * shellRadius,
+                    centerY,
+                    radial.z * shellRadius);
+                panel.transform.rotation = Quaternion.LookRotation(-radial, Vector3.up);
+                panel.transform.localScale = new Vector3(
+                    panelWidth,
+                    height,
+                    shellThickness);
+
+                Collider collider = panel.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                    if (Application.isPlaying)
+                    {
+                        Destroy(collider);
+                    }
+                    else
+                    {
+                        DestroyImmediate(collider);
+                    }
+                }
+
+                Renderer renderer = panel.GetComponent<Renderer>();
+                renderer.sharedMaterial = wallMaterial;
+                renderer.shadowCastingMode =
+                    UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+        }
+
+        private Material GetStageWallMaterial(int stageIndex)
+        {
+            Material[] materials = stageWallMaterials != null &&
+                stageWallMaterials.Length > 0
+                ? stageWallMaterials
+                : stageMaterials;
+            if (materials == null || materials.Length == 0)
+            {
+                return null;
+            }
+
+            return materials[stageIndex % materials.Length];
         }
 
         private void ApplyStageMaterial(TowerChunk chunk, int stageIndex)
@@ -1031,6 +1143,10 @@ namespace SkyhookAscent.Gameplay
             maximumTransitionRise = Mathf.Max(
                 minimumTransitionRise,
                 maximumTransitionRise);
+            shellSegmentCount = Mathf.Clamp(shellSegmentCount, 8, 24);
+            shellRadius = Mathf.Max(14f, shellRadius);
+            shellThickness = Mathf.Max(0.1f, shellThickness);
+            shellVerticalPadding = Mathf.Max(0f, shellVerticalPadding);
             maximumHorizontalRadius = Mathf.Max(5f, maximumHorizontalRadius);
             maximumTurnAngle = Mathf.Clamp(maximumTurnAngle, 45f, 135f);
             overlapPadding = Mathf.Max(0f, overlapPadding);

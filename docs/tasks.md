@@ -127,7 +127,7 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | In progress | Platforms, walls, hazard, and background are visually distinct |
+| M5.1 | Establish a simple tower material/color palette and structural shell | 1.0 h | Done | Three textured stage palettes cycle with matching collider-free wall shells; the hazard and background remain visually distinct |
 | M5.2 | Make grapple anchors readable by shape and emission, not color alone | 0.75 h | Planned | Valid anchors are identifiable during motion |
 | M5.3 | Improve rope/projectile/hit/release feedback | 0.75 h | Planned | Hook state is understandable without additional HUD text |
 | M5.4 | Tune lighting, fog, hazard warning, and restrained particles | 1.0 h | In progress | The route remains readable from the gameplay camera |
@@ -135,10 +135,12 @@ Goal: replace prototype ambiguity with a coherent tower presentation.
 
 No imported asset or audio is added without recording its license/source.
 
-The first visual-foundation pass uses only built-in URP materials: a slate,
-ice, and ember stage palette; a matching start floor; a deep-blue background;
-and restrained ambient light and distance fog. The structural shell, explicit
-hazard warning, and any particles remain deliberately unfinished.
+The completed visual-foundation pass uses project-owned procedural textures and
+URP materials for masonry, ice, and overgrown-wood stages. Each generated stage
+also receives a matching 16-panel, 20-metre-radius collider-free tower shell; the
+shell is recycled with its stage. The start floor, deep-blue background,
+restrained ambient light, and distance fog keep the route readable without
+third-party assets. Explicit hazard warning and any particles remain unfinished.
 
 ## M6 - Submission Candidate
 
@@ -166,9 +168,8 @@ No stretch task may make a required generated route depend on an upgrade.
 
 ## Immediate next action
 
-Use `F3` debug flight to inspect at least five generated stage seams, then manually
-traverse at least two full generated stages from the start. Confirm the transition
-landing is readable and passable, the palette and HUD stage change at the same
-boundary, the displayed flood speed increases, and streaming is not visible as a
-pause. Also press `R` while airborne and during an active grapple to confirm the
-player always returns to the start. After that, begin **M5.1** visual polish.
+Review the masonry, ice, and overgrown-wood stages from the normal gameplay
+camera, then begin **M5.2** by improving anchor readability without relying on
+color alone. Keep the current capsule player and defer imported character,
+animation, footsteps, menu, and optional audio until the required feedback and
+submission checks are complete.

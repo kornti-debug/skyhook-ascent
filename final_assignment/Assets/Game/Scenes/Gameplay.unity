@@ -459,8 +459,12 @@ MonoBehaviour:
   - {fileID: 6972448983460348392, guid: f05aaddd71e1f324197c0a0418c163cf, type: 3}
   stageMaterials:
   - {fileID: 2100000, guid: 5db1ee655b9b097478f857c0538ba46e, type: 2}
-  - {fileID: 2100000, guid: 919f066790bafee40a9f85ee9605ffc2, type: 2}
   - {fileID: 2100000, guid: 0c115e4adf6f02d4e8fc738fb3bf66c1, type: 2}
+  - {fileID: 2100000, guid: 919f066790bafee40a9f85ee9605ffc2, type: 2}
+  stageWallMaterials:
+  - {fileID: 2100000, guid: bd0b8dfe8954c1947b871d71fedd6cfd, type: 2}
+  - {fileID: 2100000, guid: 52fc77f3f2dbd6048b22728dd25711b6, type: 2}
+  - {fileID: 2100000, guid: 95346d4941e7ec343b9572c0c8730b37, type: 2}
   finishGoal: {fileID: 726360983}
   runController: {fileID: 1267383180}
   player: {fileID: 705153450}
@@ -476,6 +480,11 @@ MonoBehaviour:
   appendRetryDelay: 1
   minimumTransitionRise: 8
   maximumTransitionRise: 9.5
+  generateStageShell: 1
+  shellSegmentCount: 16
+  shellRadius: 20
+  shellThickness: 0.6
+  shellVerticalPadding: 4
   maximumHorizontalRadius: 12
   maximumTurnAngle: 100
   overlapPadding: 0.1
