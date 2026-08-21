@@ -26,6 +26,7 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(1f)] private float maximumWarningBorderWidth = 38f;
 
         [Header("HUD")]
+        [SerializeField, Min(0.5f)] private float initialRunIntroDuration = 8f;
         [SerializeField, Min(0.5f)] private float runIntroDuration = 5f;
         [SerializeField, Min(0.1f)] private float runIntroFadeDuration = 1.25f;
 
@@ -40,7 +41,9 @@ namespace SkyhookAscent.Gameplay
         private float runHeight;
         private float floodClearance = float.PositiveInfinity;
         private float runStartedAt;
+        private float activeRunIntroDuration;
         private string resultTitle;
+        private bool hasStartedRun;
         private bool runEnded;
 
         public bool RunEnded => runEnded;
@@ -188,6 +191,10 @@ namespace SkyhookAscent.Gameplay
             resultTitle = string.Empty;
             runHeight = 0f;
             floodClearance = float.PositiveInfinity;
+            activeRunIntroDuration = hasStartedRun
+                ? runIntroDuration
+                : initialRunIntroDuration;
+            hasStartedRun = true;
             runStartedAt = Time.unscaledTime;
 
             if (player != null)
@@ -329,15 +336,20 @@ namespace SkyhookAscent.Gameplay
         private void DrawRunIntro(float scale)
         {
             float elapsed = Time.unscaledTime - runStartedAt;
-            if (elapsed >= runIntroDuration)
+            if (elapsed >= activeRunIntroDuration)
             {
                 return;
             }
 
-            float fadeStart = Mathf.Max(0f, runIntroDuration - runIntroFadeDuration);
+            float fadeStart = Mathf.Max(
+                0f,
+                activeRunIntroDuration - runIntroFadeDuration);
             float alpha = elapsed <= fadeStart
                 ? 1f
-                : 1f - Mathf.InverseLerp(fadeStart, runIntroDuration, elapsed);
+                : 1f - Mathf.InverseLerp(
+                    fadeStart,
+                    activeRunIntroDuration,
+                    elapsed);
             float panelWidth = Mathf.Min(510f * scale, Screen.width - 32f * scale);
             float panelHeight = 142f * scale;
             Rect panel = new Rect(
@@ -522,6 +534,7 @@ namespace SkyhookAscent.Gameplay
                 floodWarningDistance);
             maximumWarningAlpha = Mathf.Clamp(maximumWarningAlpha, 0f, 0.5f);
             maximumWarningBorderWidth = Mathf.Max(1f, maximumWarningBorderWidth);
+            initialRunIntroDuration = Mathf.Max(0.5f, initialRunIntroDuration);
             runIntroDuration = Mathf.Max(0.5f, runIntroDuration);
             runIntroFadeDuration = Mathf.Clamp(
                 runIntroFadeDuration,

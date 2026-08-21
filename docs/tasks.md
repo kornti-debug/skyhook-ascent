@@ -149,7 +149,8 @@ removing the material flicker seen during biome transitions.
 The start floor now uses the same centered circular footprint while preserving
 its original surface and player spawn heights.
 The final HUD uses project-owned IMGUI presentation with no additional package:
-it introduces the climb/flood objective and controls for five seconds, then
+it introduces the climb/flood objective and controls for eight seconds on the
+first load and five seconds after restarts, then
 leaves a compact height, best, stage, flood-speed, seed, and restart card. Audio
 is intentionally omitted because every required state is already visual.
 

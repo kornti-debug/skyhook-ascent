@@ -239,7 +239,8 @@ Required HUD:
 - Current flood speed
 - Current stage, reproducible run seed, and the `R` restart shortcut
 
-Each run opens with a five-second, automatically fading objective card:
+The first run opens with an eight-second, automatically fading objective card;
+restarted runs show it for five seconds:
 `CLIMB. ESCAPE THE FLOOD.` It explains that the player must reach higher
 platforms before the water catches them and shows the movement, jump, aim, and
 grapple controls. It does not pause or delay the run.
