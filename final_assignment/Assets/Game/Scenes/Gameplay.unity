@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 976dd612239b7954a946c458e59a8ab1, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: SkyhookAscent.Gameplay::SkyhookAscent.Gameplay.TowerGenerator
   authoredFallback: {fileID: 334231173}
   generatedRoot: {fileID: 417802933}
@@ -474,8 +474,8 @@ MonoBehaviour:
   generationAheadDistance: 35
   cleanupBelowWaterMargin: 2
   appendRetryDelay: 1
-  minimumTransitionRise: 1
-  maximumTransitionRise: 1.5
+  minimumTransitionRise: 8
+  maximumTransitionRise: 9.5
   maximumHorizontalRadius: 12
   maximumTurnAngle: 100
   overlapPadding: 0.1
@@ -740,7 +740,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6181810d9d4a9c439ee65bd589892da, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkyhookAscent.Gameplay.GrappleAnchor
   attachmentPoint: {fileID: 0}
 --- !u!23 &395341542

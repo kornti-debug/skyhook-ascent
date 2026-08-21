@@ -35,8 +35,8 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(5f)] private float generationAheadDistance = 35f;
         [SerializeField, Min(0f)] private float cleanupBelowWaterMargin = 2f;
         [SerializeField, Min(0.1f)] private float appendRetryDelay = 1f;
-        [SerializeField, Min(0f)] private float minimumTransitionRise = 1f;
-        [SerializeField, Min(0f)] private float maximumTransitionRise = 1.5f;
+        [SerializeField, Min(0f)] private float minimumTransitionRise = 8f;
+        [SerializeField, Min(0f)] private float maximumTransitionRise = 9.5f;
 
         [Header("Placement")]
         [SerializeField, Min(5f)] private float maximumHorizontalRadius = 12f;
@@ -880,7 +880,8 @@ namespace SkyhookAscent.Gameplay
             }
 
             if (transitionChunkPrefab != null &&
-                (transitionChunkPrefab.Entry == null || transitionChunkPrefab.Exit == null))
+                (transitionChunkPrefab.Entry == null || transitionChunkPrefab.Exit == null ||
+                    transitionChunkPrefab.GetComponentInChildren<GrappleAnchor>(true) == null))
             {
                 return false;
             }

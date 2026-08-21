@@ -142,11 +142,12 @@ are then removed.
   of climbing; the exact height varies with the selected chunks.
 - A slightly oversized round landing platform clearly separates stages and
   provides a short pacing reset without spanning or blocking the tower shaft.
-  It uses a flat mesh collider and is placed beyond, rather than inside, the
-  preceding platform. Its top is 1.25 metres above the preceding exit, making
-  the boundary an ordinary upward jump rather than a same-height obstruction.
-  Its placement must also preserve player-sized landing and jump headroom above
-  every platform in the immediately preceding chunk.
+  It is a mandatory zip transition: the landing top is approximately 4.9
+  metres above and 8 metres forward from the previous exit, with a centered
+  anchor approximately 8.4 metres above the entry. This keeps the broad landing
+  safely above earlier jump surfaces while remaining inside the base grapple
+  range. Its placement must preserve the projectile corridor and player-sized
+  headroom around the previous route.
 - Platforms receive the material palette of their height stage, such as stone,
   wood, ice, or overgrown masonry.
 - The first presentation pass uses a restrained slate, ice, and ember palette
@@ -168,7 +169,7 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 3. Mandatory grapple across the shaft
 4. Safe jumps versus grapple shortcut
 5. Recovery/rest section
-6. Round transition landing between generated stages
+6. Raised round zip-transition landing between generated stages
 
 ### Authored chunk prototype
 
@@ -310,4 +311,7 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - The transition landing and three stage palettes have a first coherent color,
   lighting, and fog pass; the structural tower shell and final traversal
   readability still need a human play-test.
+- The raised zip transition passed an automated eight-stage generation stress
+  run, but its ballistic aim and landing feel still need a normal player
+  traversal check before the submission build is frozen.
 - Roguelike upgrades are not implemented and remain outside the current MVP.
