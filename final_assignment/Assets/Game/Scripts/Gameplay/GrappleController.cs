@@ -39,6 +39,11 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(0.005f)] private float ropeWidth = 0.035f;
         [SerializeField] private Color ropeColor = new Color(0.15f, 0.9f, 1f, 1f);
 
+        private static readonly Color OutboundRopeColor =
+            new Color(1f, 0.48f, 0.08f, 1f);
+        private static readonly Color ReturningRopeColor =
+            new Color(1f, 0.08f, 0.3f, 1f);
+
         private InputAction grappleAction;
         private Collider[] ownerColliders;
         private GrappleProjectile activeProjectile;
@@ -141,6 +146,7 @@ namespace SkyhookAscent.Gameplay
 
             ropeRenderer.SetPosition(0, HookOriginPosition);
             ropeRenderer.SetPosition(1, activeProjectile.transform.position);
+            UpdateRopeAppearance();
         }
 
         public void FireProjectile()
@@ -233,8 +239,10 @@ namespace SkyhookAscent.Gameplay
         private void CompleteZip(bool reachedAnchor)
         {
             GrappleProjectile projectile = activeProjectile;
+            GrappleAnchor completedAnchor = activeAnchor;
             activeAnchor = null;
             EndPlayerPull(reachedAnchor);
+            completedAnchor?.PlayReleaseFeedback(reachedAnchor);
 
             if (projectile != null)
             {
@@ -306,10 +314,37 @@ namespace SkyhookAscent.Gameplay
             {
                 runtimeRopeMaterial = new Material(ropeShader)
                 {
-                    color = ropeColor
+                    color = Color.white
                 };
                 ropeRenderer.sharedMaterial = runtimeRopeMaterial;
             }
+        }
+
+        private void UpdateRopeAppearance()
+        {
+            Color stateColor;
+            float stateWidth;
+            if (IsPulling)
+            {
+                float pulse = 1f + Mathf.Sin(Time.time * 12f) * 0.12f;
+                stateColor = Color.Lerp(ropeColor, Color.white, 0.28f);
+                stateWidth = ropeWidth * 1.65f * pulse;
+            }
+            else if (activeProjectile != null && activeProjectile.IsReturning)
+            {
+                stateColor = ReturningRopeColor;
+                stateWidth = ropeWidth * 0.72f;
+            }
+            else
+            {
+                stateColor = OutboundRopeColor;
+                stateWidth = ropeWidth;
+            }
+
+            ropeRenderer.startColor = stateColor;
+            ropeRenderer.endColor = stateColor;
+            ropeRenderer.startWidth = stateWidth;
+            ropeRenderer.endWidth = stateWidth;
         }
 
         private void OnDestroy()

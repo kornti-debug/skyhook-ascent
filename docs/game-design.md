@@ -78,7 +78,11 @@ The first prototype may use a capsule and primitives. Character animation is not
 - There is exactly one active hook: firing is blocked while it is flying, returning, or pulling
 - A valid hit automatically pulls the player toward the anchor at a capped speed
 - The hook releases automatically near the anchor, allowing the player to fall onto the platform below it
-- The rope is visual feedback and shortens naturally as the distance closes; it is not a simulated pendulum
+- The rope and projectile communicate their state without extra HUD text:
+  orange while outbound, narrow magenta/red while a miss is being retrieved,
+  and thicker pulsing cyan while attached and pulling. A valid hit briefly
+  expands/flashes the anchor, and release produces a second white flash.
+- The rope shortens naturally as the distance closes; it is not a simulated pendulum
 - Grapple can be fired from the ground or in the air
 
 Not included in the MVP:
@@ -313,6 +317,8 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
 - Zip speed, arrival distance, and anchor placement may consume more tuning time than expected.
 - A real projectile can miss thin targets at speed; collision handling must be robust.
 - A blocked path to an anchor must time out without trapping the player in the pulling state.
+- Grapple-state colors supplement motion and thickness changes; gameplay does
+  not depend on color perception alone.
 - Camera collision inside the cylindrical tower needs early testing.
 - Generated chunk rotation can create visual intersections even when traversal remains valid.
 - Rising hazard speed must pressure the player without making safe routes pointless.

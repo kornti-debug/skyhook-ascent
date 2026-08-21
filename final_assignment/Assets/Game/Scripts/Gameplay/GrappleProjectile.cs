@@ -17,8 +17,25 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Min(0.1f)] private float safetyLifetime = 8f;
         [SerializeField, Min(0.1f)] private float maximumReturnDuration = 1.25f;
 
+        private static readonly Color OutboundColor =
+            new Color(1f, 0.28f, 0.04f, 1f);
+        private static readonly Color OutboundEmission =
+            new Color(5f, 0.7f, 0.05f, 1f);
+        private static readonly Color ReturningColor =
+            new Color(1f, 0.06f, 0.28f, 1f);
+        private static readonly Color ReturningEmission =
+            new Color(5f, 0.08f, 0.7f, 1f);
+        private static readonly Color AttachedColor =
+            new Color(0.28f, 0.95f, 1f, 1f);
+        private static readonly Color AttachedEmission =
+            new Color(0.5f, 4.5f, 6f, 1f);
+
         private Rigidbody body;
         private Collider projectileCollider;
+        private Renderer projectileRenderer;
+        private TrailRenderer trailRenderer;
+        private MaterialPropertyBlock propertyBlock;
+        private Vector3 baseScale;
         private GrappleController owner;
         private float expiresAt;
         private float maximumRange;
@@ -40,6 +57,25 @@ namespace SkyhookAscent.Gameplay
         private void Awake()
         {
             CacheComponents();
+            projectileRenderer = GetComponent<Renderer>();
+            trailRenderer = GetComponent<TrailRenderer>();
+            propertyBlock = new MaterialPropertyBlock();
+            baseScale = transform.localScale;
+            if (projectileRenderer != null)
+            {
+                projectileRenderer.shadowCastingMode =
+                    UnityEngine.Rendering.ShadowCastingMode.Off;
+                projectileRenderer.receiveShadows = false;
+            }
+
+            if (trailRenderer != null)
+            {
+                trailRenderer.shadowCastingMode =
+                    UnityEngine.Rendering.ShadowCastingMode.Off;
+                trailRenderer.receiveShadows = false;
+            }
+
+            ApplyVisual(OutboundColor, OutboundEmission, 1f);
         }
 
         private void CacheComponents()
@@ -79,6 +115,16 @@ namespace SkyhookAscent.Gameplay
             if (state == ProjectileState.Returning)
             {
                 UpdateReturn();
+                if (state == ProjectileState.Returning)
+                {
+                    float pulse = 1f + Mathf.Sin(Time.time * 13f) * 0.16f;
+                    ApplyVisual(ReturningColor, ReturningEmission, pulse);
+                }
+            }
+            else if (state == ProjectileState.Attached)
+            {
+                float pulse = 1.12f + Mathf.Sin(Time.time * 10f) * 0.08f;
+                ApplyVisual(AttachedColor, AttachedEmission, pulse);
             }
         }
 
@@ -128,6 +174,12 @@ namespace SkyhookAscent.Gameplay
             distanceTravelled = 0f;
             previousPosition = body.position;
             body.linearVelocity = initialVelocity;
+            if (trailRenderer != null)
+            {
+                trailRenderer.emitting = true;
+                trailRenderer.time = 0.35f;
+            }
+            ApplyVisual(OutboundColor, OutboundEmission, 1f);
 
             if (ignoredColliders == null)
             {
@@ -168,6 +220,12 @@ namespace SkyhookAscent.Gameplay
             body.isKinematic = true;
             projectileCollider.enabled = false;
             transform.position = hitAnchor.AttachmentPosition;
+            if (trailRenderer != null)
+            {
+                trailRenderer.emitting = false;
+            }
+            ApplyVisual(AttachedColor, AttachedEmission, 1.2f);
+            hitAnchor.PlayHitFeedback();
             owner?.HandleProjectileAttached(this, hitAnchor);
         }
 
@@ -183,6 +241,13 @@ namespace SkyhookAscent.Gameplay
             body.useGravity = false;
             body.isKinematic = true;
             projectileCollider.enabled = false;
+
+            if (trailRenderer != null)
+            {
+                trailRenderer.emitting = true;
+                trailRenderer.time = 0.2f;
+            }
+            ApplyVisual(ReturningColor, ReturningEmission, 1f);
 
             returnStartPosition = transform.position;
             returnStartedAt = Time.time;
@@ -239,6 +304,34 @@ namespace SkyhookAscent.Gameplay
             projectileCollider.enabled = false;
             owner?.HandleProjectileRecovered(this);
             Destroy(gameObject);
+        }
+
+        private void ApplyVisual(
+            Color baseColor,
+            Color emissionColor,
+            float scaleMultiplier)
+        {
+            transform.localScale = baseScale * scaleMultiplier;
+            ApplyColors(projectileRenderer, baseColor, emissionColor);
+            ApplyColors(trailRenderer, baseColor, emissionColor);
+        }
+
+        private void ApplyColors(
+            Renderer targetRenderer,
+            Color baseColor,
+            Color emissionColor)
+        {
+            if (targetRenderer == null)
+            {
+                return;
+            }
+
+            targetRenderer.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetColor("_BaseColor", baseColor);
+            propertyBlock.SetColor("_Color", baseColor);
+            propertyBlock.SetColor("_EmissionColor", emissionColor);
+            targetRenderer.SetPropertyBlock(propertyBlock);
+            propertyBlock.Clear();
         }
 
         private void OnValidate()

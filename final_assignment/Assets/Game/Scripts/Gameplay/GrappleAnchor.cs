@@ -33,6 +33,23 @@ namespace SkyhookAscent.Gameplay
         private LineRenderer frameRenderer;
         private Transform frameRoot;
         private Camera viewCamera;
+        private float feedbackStartedAt;
+        private float feedbackEndsAt;
+        private Color feedbackColor;
+
+        public void PlayHitFeedback()
+        {
+            BeginFeedback(new Color(0.65f, 1f, 0.72f, 1f), 0.2f);
+        }
+
+        public void PlayReleaseFeedback(bool successful)
+        {
+            BeginFeedback(
+                successful
+                    ? Color.white
+                    : new Color(1f, 0.2f, 0.08f, 1f),
+                0.24f);
+        }
 
         private void Start()
         {
@@ -119,6 +136,14 @@ namespace SkyhookAscent.Gameplay
             float pulse = IsInRange
                 ? 1f + Mathf.Sin(Time.time * pulseSpeed) * pulseAmount
                 : 0.9f;
+
+            float feedbackStrength = feedbackEndsAt > Time.time
+                ? 1f - Mathf.InverseLerp(
+                    feedbackStartedAt,
+                    feedbackEndsAt,
+                    Time.time)
+                : 0f;
+            pulse += feedbackStrength * 0.3f;
             if (frameRoot != null)
             {
                 frameRoot.localScale = Vector3.one * pulse;
@@ -128,6 +153,11 @@ namespace SkyhookAscent.Gameplay
             Color emissionColor = IsInRange
                 ? inRangeEmissionColor * (0.9f + pulse * 0.1f)
                 : distantEmissionColor;
+            coreColor = Color.Lerp(coreColor, feedbackColor, feedbackStrength);
+            emissionColor = Color.Lerp(
+                emissionColor,
+                feedbackColor * 6f,
+                feedbackStrength);
             ApplyColors(coreRenderer, coreColor, emissionColor);
 
             Color frameColor = IsInRange
@@ -136,7 +166,19 @@ namespace SkyhookAscent.Gameplay
             Color frameEmission = IsInRange
                 ? inRangeEmissionColor * 0.75f
                 : distantEmissionColor * 0.35f;
+            frameColor = Color.Lerp(frameColor, feedbackColor, feedbackStrength);
+            frameEmission = Color.Lerp(
+                frameEmission,
+                feedbackColor * 5f,
+                feedbackStrength);
             ApplyColors(frameRenderer, frameColor, frameEmission);
+        }
+
+        private void BeginFeedback(Color color, float duration)
+        {
+            feedbackColor = color;
+            feedbackStartedAt = Time.time;
+            feedbackEndsAt = Time.time + Mathf.Max(0.05f, duration);
         }
 
         private void ApplyColors(
