@@ -117,11 +117,12 @@ clearance: two chunks may not intersect yet still be rejected if one blocks an
 earlier jump or grapple approach. Physics transforms are synchronized before
 those tests, and an additional inferred final-landing corridor prevents the next
 chunk from forming a wall across the preceding chunk's last jump. Stage
-transitions additionally require a 1.0-1.5 m vertical rise; the current prefab
-uses 1.25 m so the boundary is a normal upward jump. Transitions are not exempt
-from protected traversal corridors: their landing geometry must also leave every
-preceding grapple trajectory unobstructed. Seam validation is bidirectional, so
-the previous chunk also cannot obstruct the new chunk's firing or jump corridor.
+transitions use a mandatory anchored zip with an 8.0-9.5 m rise so their landing
+geometry cannot form a low ceiling over the previous route. Transitions are not
+exempt from protected traversal corridors: their landing geometry must also
+leave every preceding grapple trajectory unobstructed. Seam validation is
+bidirectional, so the previous chunk also cannot obstruct the new chunk's firing
+or jump corridor.
 Every traversable platform inside a chunk additionally protects a vertical
 player-sized landing and jump-headroom volume when the generator places the next
 stage transition. This prevents the rotated transition from becoming a low
