@@ -142,7 +142,9 @@ Generation rules:
 10. Remove chunks only after they are below the flood and can no longer be
    recovered onto.
 11. Use one numeric run seed for reproducibility and diagnostics.
-12. Keep the authored course active if initial generation cannot complete safely.
+12. If initial generation exhausts its attempts, report the failure and let `R`
+    retry with new seeds. A failed replacement attempt during an active run keeps
+    the current valid tower intact.
 
 The current implementation starts with one validated 24-chunk stage and streams
 another complete stage before the player approaches the generated top. Each
@@ -195,25 +197,14 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 5. Recovery/rest section
 6. Raised round zip-transition landing between generated stages
 
-### Authored chunk prototype
+### Reusable chunk library
 
-Before prefab conversion or procedural assembly, `Gameplay.unity` contains a
-manually arranged clockwise spiral made from four named chunk groups:
-
-1. `Chunk_00_Warmup`: three increasingly high jump platforms.
-2. `Chunk_01_Zip`: one mandatory ballistic shot to an anchor centered above a
-   wide landing platform.
-3. `Chunk_02_Jumps`: two more platforms continuing around the tower axis.
-4. `Chunk_03_MixedRecovery`: a second zip landing followed by a normal jump and
-   a wider recovery/exit platform.
-
-Each group has an `Entry` and `Exit` transform showing how chunks connect. The
-four validated groups are preserved in the scene as the fallback and converted
-to reusable prefabs. Derived jump, grapple, mixed, mirrored, precision, and
-recovery variants bring the current asset set to 12 shapes: one fixed warm-up
-plus 11 reusable choices. Seed `104729` remains a useful deterministic
-regression seed. Normal play uses a fresh run seed and continues beyond the
-initial 24-chunk stage.
+The final scene contains no prebuilt course. Runtime generation uses a fixed
+start prefab, a raised anchored stage-transition prefab, and reusable jump,
+grapple, mixed, mirrored, precision, quick-turn, and recovery variants. Every
+chunk stores `Entry` and `Exit` transforms plus selection and traversal metadata.
+Seed `104729` remains a useful deterministic regression seed. Normal play uses a
+fresh run seed and continues beyond the initial 24-chunk stage.
 
 ## Difficulty progression
 
@@ -255,11 +246,10 @@ The final HUD uses one compact top-left information card, a temporary centered
 objective card, the proximity warning, and a centered run-end panel. Audio and
 a separate menu remain optional scope cuts.
 
-The authored fallback still contains a round goal platform for regression
-testing, but generated play is endless and has no normal finish. Flood contact
-ends the run. `R` cancels any active grapple, creates a fresh seeded tower, and
-returns the player, hazard, score, and grapple state to the start. The camera
-follows the reset player while preserving the player's current aim orientation.
+Generated play is endless and has no finish state. Flood contact ends the run.
+`R` cancels any active grapple, creates a fresh seeded tower, and returns the
+player, hazard, score, and grapple state to the start. The camera follows the
+reset player while preserving the player's current aim orientation.
 
 In the Unity Editor only, `F3` toggles collision-free debug flight for streaming
 and geometry inspection. Use `WASD` to move, `Space`/`E` to rise,
@@ -274,7 +264,7 @@ Persistent high scores are optional.
 - Grapple projectile visibly arcs and attaches only to valid anchors.
 - A valid hit automatically zips the player to the anchor and releases near it.
 - A miss reaches its range or an invalid surface, returns visibly, and only then restores grapple readiness.
-- One handcrafted fallback course supports a complete start-climb-fail-restart loop.
+- The generated tower supports a complete start-climb-fail-restart loop.
 - Generated play streams additional stages before the player reaches the top.
 - Rising hazard reliably ends the run.
 - At least four chunk prefabs assemble from a fixed seed.

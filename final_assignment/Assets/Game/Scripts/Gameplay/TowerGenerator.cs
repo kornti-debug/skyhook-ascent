@@ -11,15 +11,13 @@ namespace SkyhookAscent.Gameplay
     {
         private const int MinimumSeedAttempts = 32;
 
-        [Header("Course References")]
-        [SerializeField] private GameObject authoredFallback;
+        [Header("Tower References")]
         [SerializeField] private Transform generatedRoot;
         [SerializeField] private TowerChunk startChunkPrefab;
         [SerializeField] private TowerChunk transitionChunkPrefab;
         [SerializeField] private TowerChunk[] chunkPrefabs;
         [SerializeField] private Material[] stageMaterials;
         [SerializeField] private Material[] stageWallMaterials;
-        [SerializeField] private Transform finishGoal;
         [SerializeField] private RunController runController;
         [SerializeField] private Transform player;
         [SerializeField] private RisingHazard hazard;
@@ -32,7 +30,6 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private bool randomizeInitialSeed = true;
 
         [Header("Endless Streaming")]
-        [SerializeField] private bool endlessMode = true;
         [SerializeField, Min(5f)] private float generationAheadDistance = 35f;
         [SerializeField, Min(0f)] private float cleanupBelowWaterMargin = 2f;
         [SerializeField, Min(0.1f)] private float appendRetryDelay = 1f;
@@ -63,21 +60,17 @@ namespace SkyhookAscent.Gameplay
         private string lastGenerationFailure = string.Empty;
         private int directionRejections;
         private int clearanceRejections;
-        private Vector3 fallbackFinishPosition;
-        private Quaternion fallbackFinishRotation;
         private Vector3 nextAttachmentPoint;
         private TowerChunk lastPlacedChunk;
         private float highestGeneratedY;
         private float nextAppendAttemptTime;
         private int nextStageIndex;
-        private bool capturedFallbackFinish;
         private bool isGenerating;
 
         public int Seed => seed;
         public string LastSequence => lastSequence;
         public string LastGenerationFailure => lastGenerationFailure;
-        public bool UsingGeneratedCourse { get; private set; }
-        public bool EndlessMode => endlessMode;
+        public bool HasGeneratedTower { get; private set; }
         public int ActiveStageCount => activeStages.Count;
         public float HighestGeneratedY => highestGeneratedY;
         public int GeneratedChunkTotal
@@ -115,7 +108,6 @@ namespace SkyhookAscent.Gameplay
                 MinimumSeedAttempts,
                 maximumSeedAttempts);
             ResolveRuntimeReferences();
-            CaptureFallbackFinish();
             if (!generateOnAwake)
             {
                 return;
@@ -123,17 +115,17 @@ namespace SkyhookAscent.Gameplay
 
             if (randomizeInitialSeed)
             {
-                GenerateNextCourse();
+                GenerateNextTower();
             }
             else
             {
-                GenerateCourse();
+                GenerateTower();
             }
         }
 
         private void Update()
         {
-            if (!endlessMode || !UsingGeneratedCourse || isGenerating || player == null)
+            if (!HasGeneratedTower || isGenerating || player == null)
             {
                 return;
             }
@@ -196,33 +188,34 @@ namespace SkyhookAscent.Gameplay
         }
 
 
-        public bool GenerateCourse()
+        public bool GenerateTower()
         {
             if (!HasValidConfiguration())
             {
-                ActivateFallback("Generator configuration is incomplete.");
+                lastGenerationFailure = "Generator configuration is incomplete.";
+                Debug.LogError(lastGenerationFailure, this);
                 return false;
             }
 
             if (TryBuildInitialStage(seed, out StageBuild build, out string failureReason))
             {
-                CommitNewCourse(seed, build);
+                CommitNewTower(seed, build);
                 return true;
             }
 
-            ActivateFallback($"Seed {seed}: {failureReason}");
+            lastGenerationFailure = $"Seed {seed}: {failureReason}";
+            Debug.LogError(
+                $"Procedural tower generation failed: {lastGenerationFailure}",
+                this);
             return false;
         }
 
-        public bool GenerateNextCourse()
+        public bool GenerateNextTower()
         {
             if (!HasValidConfiguration())
             {
-                if (!UsingGeneratedCourse)
-                {
-                    ActivateFallback("Generator configuration is incomplete.");
-                }
-
+                lastGenerationFailure = "Generator configuration is incomplete.";
+                Debug.LogError(lastGenerationFailure, this);
                 return false;
             }
 
@@ -245,7 +238,7 @@ namespace SkyhookAscent.Gameplay
                         out StageBuild build,
                         out string failureReason))
                     {
-                        CommitNewCourse(candidateSeed, build);
+                        CommitNewTower(candidateSeed, build);
                         if (rejectedSeeds.Count > 0)
                         {
                             Debug.LogWarning(
@@ -262,17 +255,13 @@ namespace SkyhookAscent.Gameplay
 
                 lastGenerationFailure =
                     $"Could not generate a valid tower after {maximumSeedAttempts} seed attempts.";
-                if (!UsingGeneratedCourse)
-                {
-                    ActivateFallback(lastGenerationFailure);
-                }
-                else
-                {
-                    Debug.LogError(
-                        $"{lastGenerationFailure} Keeping the current course and seed {seed}. " +
-                        $"Rejected: {SummarizeRejectedSeeds(rejectedSeeds)}.",
-                        this);
-                }
+                string recoveryMessage = HasGeneratedTower
+                    ? $" Keeping the current tower and seed {seed}."
+                    : " Press R to try another generated tower.";
+                Debug.LogError(
+                    $"{lastGenerationFailure}{recoveryMessage} " +
+                    $"Rejected: {SummarizeRejectedSeeds(rejectedSeeds)}.",
+                    this);
 
                 return false;
             }
@@ -412,7 +401,7 @@ namespace SkyhookAscent.Gameplay
                 if (placedChunk == null)
                 {
                     failureReason = $"no valid placement for chunk {chunkNumber}";
-                    DetachAndDestroyCourseRoot(stageRoot);
+                    DetachAndDestroyStageRoot(stageRoot);
                     ResetPlacementState();
                     build = null;
                     return false;
@@ -461,10 +450,10 @@ namespace SkyhookAscent.Gameplay
             return true;
         }
 
-        private void CommitNewCourse(int candidateSeed, StageBuild build)
+        private void CommitNewTower(int candidateSeed, StageBuild build)
         {
             build.Root.SetParent(null, true);
-            ClearGeneratedCourse();
+            ClearGeneratedTower();
             build.Root.SetParent(generatedRoot, true);
 
             seed = candidateSeed;
@@ -477,10 +466,8 @@ namespace SkyhookAscent.Gameplay
             lastSequence = build.Sequence;
             lastGenerationFailure = string.Empty;
 
-            authoredFallback.SetActive(false);
-            UsingGeneratedCourse = true;
-            ConfigureFinishForCurrentMode(build);
-            runController.ConfigureCourse(finishGoal, seed);
+            HasGeneratedTower = true;
+            runController.ConfigureSeed(seed);
             Debug.Log(
                 $"Generated endless tower seed {seed}, stage 1: {lastSequence}. " +
                 $"Rejected rotations: direction={directionRejections}, " +
@@ -507,26 +494,6 @@ namespace SkyhookAscent.Gameplay
                 $"Active stages={activeStages.Count}, chunks={GeneratedChunkTotal}, " +
                 $"top={highestGeneratedY:0.0} m.",
                 this);
-        }
-
-        public void Configure(
-            GameObject fallback,
-            Transform outputRoot,
-            TowerChunk startPrefab,
-            TowerChunk[] reusablePrefabs,
-            Transform finish,
-            RunController controller,
-            int runSeed,
-            int chunkCount)
-        {
-            authoredFallback = fallback;
-            generatedRoot = outputRoot;
-            startChunkPrefab = startPrefab;
-            chunkPrefabs = reusablePrefabs;
-            finishGoal = finish;
-            runController = controller;
-            seed = runSeed;
-            generatedChunkCount = Mathf.Max(4, chunkCount);
         }
 
         private TowerChunk TrySelectAndPlaceChunk(
@@ -818,7 +785,7 @@ namespace SkyhookAscent.Gameplay
                 }
 
                 activeStages.RemoveAt(stageIndex);
-                DetachAndDestroyCourseRoot(stage.Root);
+                DetachAndDestroyStageRoot(stage.Root);
             }
 
             if (removedChunkCount > 0)
@@ -1009,36 +976,12 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
-        private void ConfigureFinishForCurrentMode(StageBuild build)
-        {
-            if (finishGoal == null)
-            {
-                return;
-            }
-
-            finishGoal.gameObject.SetActive(!endlessMode);
-            if (endlessMode)
-            {
-                return;
-            }
-
-            finishGoal.SetPositionAndRotation(
-                build.NextAttachmentPoint + Vector3.up * 0.2f,
-                build.LastChunk.Exit.rotation);
-            FinishGoal finishComponent = finishGoal.GetComponent<FinishGoal>();
-            finishComponent?.Configure(runController);
-        }
-
         private bool HasValidConfiguration()
         {
-            if (authoredFallback == null || generatedRoot == null ||
-                startChunkPrefab == null || finishGoal == null || runController == null ||
+            if (generatedRoot == null || startChunkPrefab == null ||
+                transitionChunkPrefab == null || runController == null ||
+                player == null || hazard == null ||
                 chunkPrefabs == null || chunkPrefabs.Length < 4)
-            {
-                return false;
-            }
-
-            if (endlessMode && (transitionChunkPrefab == null || player == null || hazard == null))
             {
                 return false;
             }
@@ -1048,9 +991,9 @@ namespace SkyhookAscent.Gameplay
                 return false;
             }
 
-            if (transitionChunkPrefab != null &&
-                (transitionChunkPrefab.Entry == null || transitionChunkPrefab.Exit == null ||
-                    transitionChunkPrefab.GetComponentInChildren<GrappleAnchor>(true) == null))
+            if (transitionChunkPrefab.Entry == null ||
+                transitionChunkPrefab.Exit == null ||
+                transitionChunkPrefab.GetComponentInChildren<GrappleAnchor>(true) == null)
             {
                 return false;
             }
@@ -1084,48 +1027,13 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
-        private void ActivateFallback(string reason)
-        {
-            ClearGeneratedCourse();
-            UsingGeneratedCourse = false;
-            lastSequence = string.Empty;
-            lastGenerationFailure = reason;
-            if (authoredFallback != null)
-            {
-                authoredFallback.SetActive(true);
-            }
-
-            if (capturedFallbackFinish && finishGoal != null)
-            {
-                finishGoal.gameObject.SetActive(true);
-                finishGoal.SetPositionAndRotation(
-                    fallbackFinishPosition,
-                    fallbackFinishRotation);
-                runController?.ConfigureCourse(finishGoal, seed);
-            }
-
-            Debug.LogWarning($"Procedural tower fallback: {reason}", this);
-        }
-
-        private void CaptureFallbackFinish()
-        {
-            if (capturedFallbackFinish || finishGoal == null)
-            {
-                return;
-            }
-
-            fallbackFinishPosition = finishGoal.position;
-            fallbackFinishRotation = finishGoal.rotation;
-            capturedFallbackFinish = true;
-        }
-
-        private void ClearGeneratedCourse()
+        private void ClearGeneratedTower()
         {
             for (int i = generatedRoot != null ? generatedRoot.childCount - 1 : -1;
                 i >= 0;
                 i--)
             {
-                DetachAndDestroyCourseRoot(generatedRoot.GetChild(i));
+                DetachAndDestroyStageRoot(generatedRoot.GetChild(i));
             }
 
             activeStages.Clear();
@@ -1174,16 +1082,16 @@ namespace SkyhookAscent.Gameplay
             Destroy(target);
         }
 
-        private static void DetachAndDestroyCourseRoot(Transform courseRoot)
+        private static void DetachAndDestroyStageRoot(Transform stageRoot)
         {
-            if (courseRoot == null)
+            if (stageRoot == null)
             {
                 return;
             }
 
-            courseRoot.gameObject.SetActive(false);
-            courseRoot.SetParent(null, true);
-            Destroy(courseRoot.gameObject);
+            stageRoot.gameObject.SetActive(false);
+            stageRoot.SetParent(null, true);
+            Destroy(stageRoot.gameObject);
         }
 
         private void OnValidate()

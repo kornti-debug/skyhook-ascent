@@ -13,7 +13,6 @@ namespace SkyhookAscent.Gameplay
         [SerializeField] private InputActionAsset inputActions;
         [SerializeField] private Transform player;
         [SerializeField] private RisingHazard hazard;
-        [SerializeField] private Transform finish;
 
         [Header("Run")]
         [SerializeField, Min(0f)] private float hazardContactMargin = 0.85f;
@@ -42,7 +41,6 @@ namespace SkyhookAscent.Gameplay
         private float floodClearance = float.PositiveInfinity;
         private float runStartedAt;
         private float activeRunIntroDuration;
-        private string resultTitle;
         private bool hasStartedRun;
         private bool runEnded;
 
@@ -51,9 +49,8 @@ namespace SkyhookAscent.Gameplay
         public float BestHeight => bestHeight;
         public float FloodClearance => floodClearance;
 
-        public void ConfigureCourse(Transform courseFinish, int seed)
+        public void ConfigureSeed(int seed)
         {
-            finish = courseFinish;
             displayedSeed = seed;
         }
 
@@ -71,15 +68,6 @@ namespace SkyhookAscent.Gameplay
             if (hazard == null)
             {
                 hazard = FindFirstObjectByType<RisingHazard>();
-            }
-
-            if (finish == null)
-            {
-                GameObject finishObject = GameObject.Find("FinishGoal");
-                if (finishObject != null)
-                {
-                    finish = finishObject.transform;
-                }
             }
 
             towerGenerator = FindFirstObjectByType<TowerGenerator>();
@@ -140,7 +128,7 @@ namespace SkyhookAscent.Gameplay
                 player.position.y - playerStartPosition.y);
             bestHeight = Mathf.Max(bestHeight, runHeight);
 
-            if (towerGenerator != null && towerGenerator.EndlessMode)
+            if (towerGenerator != null && towerGenerator.HasGeneratedTower)
             {
                 hazard.ReportPlayerProgress(
                     runHeight,
@@ -156,15 +144,7 @@ namespace SkyhookAscent.Gameplay
                 (hazard.SurfaceHeight + hazardContactMargin);
             if (floodClearance <= 0f)
             {
-                EndRun("THE FLOOD CAUGHT YOU", freezePlayer: false);
-            }
-        }
-
-        public void CompleteRun()
-        {
-            if (!runEnded)
-            {
-                EndRun("TOWER CLEARED", freezePlayer: true);
+                EndRun();
             }
         }
 
@@ -173,10 +153,10 @@ namespace SkyhookAscent.Gameplay
             grappleController?.ResetForNewRun();
             playerController?.ResetForNewRun();
 
-            if (towerGenerator == null || !towerGenerator.GenerateNextCourse())
+            if (towerGenerator == null || !towerGenerator.GenerateNextTower())
             {
                 Debug.LogWarning(
-                    "New run request was cancelled because no valid replacement course was generated.",
+                    "New run request was cancelled because no valid replacement tower was generated.",
                     this);
                 StartRun();
                 return;
@@ -188,7 +168,6 @@ namespace SkyhookAscent.Gameplay
         public void StartRun()
         {
             runEnded = false;
-            resultTitle = string.Empty;
             runHeight = 0f;
             floodClearance = float.PositiveInfinity;
             activeRunIntroDuration = hasStartedRun
@@ -231,25 +210,13 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
-        private void EndRun(string title, bool freezePlayer)
+        private void EndRun()
         {
             runEnded = true;
-            resultTitle = title;
             bestHeight = Mathf.Max(bestHeight, runHeight);
             hazard.Stop();
             playerController?.SetMovementEnabled(false);
             grappleController?.SetGrappleEnabled(false);
-
-            if (freezePlayer && player != null)
-            {
-                Rigidbody playerBody = player.GetComponent<Rigidbody>();
-                if (playerBody != null)
-                {
-                    playerBody.linearVelocity = Vector3.zero;
-                    playerBody.angularVelocity = Vector3.zero;
-                    playerBody.useGravity = false;
-                }
-            }
 
             if (crosshair != null)
             {
@@ -408,9 +375,7 @@ namespace SkyhookAscent.Gameplay
                 (Screen.height - panelHeight) * 0.5f,
                 panelWidth,
                 panelHeight);
-            Color accentColor = resultTitle == "TOWER CLEARED"
-                ? new Color(0.3f, 1f, 0.65f, 1f)
-                : new Color(1f, 0.25f, 0.08f, 1f);
+            Color accentColor = new Color(1f, 0.25f, 0.08f, 1f);
             DrawFilledRect(panel, new Color(0.01f, 0.025f, 0.05f, 0.94f));
             DrawFilledRect(
                 new Rect(panel.x, panel.y, panel.width, 5f * scale),
@@ -437,7 +402,7 @@ namespace SkyhookAscent.Gameplay
             };
 
             GUI.Label(new Rect(panel.x, panel.y + 26f * scale, panel.width, 52f * scale),
-                resultTitle, titleStyle);
+                "THE FLOOD CAUGHT YOU", titleStyle);
             GUI.Label(new Rect(panel.x, panel.y + 94f * scale, panel.width, 32f * scale),
                 $"RUN HEIGHT  {runHeight:0.0} m", resultStyle);
             GUI.Label(new Rect(panel.x, panel.y + 128f * scale, panel.width, 32f * scale),

@@ -91,11 +91,10 @@ the mechanic loop, not player skill.
 
 Open `Assets/Game` and the `Gameplay` hierarchy.
 
-Explain the seven root objects:
+Explain the six root objects:
 
 - `Main Camera` owns orbit/follow behavior and the crosshair.
-- `Environment` owns the start floor, rising flood, and finite fallback goal.
-- `Course` is a handcrafted safety/fallback course.
+- `Environment` owns the start floor and rising flood.
 - `Player` owns Rigidbody movement, grapple coordination, and editor-only flight.
 - `GameLoop` owns run state, scoring, death, restart, and HUD.
 - `ProceduralTower` owns generation and the generated hierarchy.
@@ -205,17 +204,20 @@ Show one chunk prefab and its `TowerChunk` component. Explain its metadata:
 Then show the `ProceduralTower` Inspector and
 [`TowerGenerator.cs`](../final_assignment/Assets/Game/Scripts/Gameplay/TowerGenerator.cs):
 
-1. Lines 27-54: seed, 24 chunks per stage, streaming distance, shell, radius,
-   turn limit, and attempt limits are Inspector-controlled data.
-2. Lines 217-283: a restart searches for a valid new runtime seed and keeps the
-   current playable course if replacement generation fails.
-3. Lines 349-461: each stage uses `System.Random(stageSeed)`, places a mandatory
+1. The serialized fields near the top expose the seed, 24 chunks per stage,
+   streaming distance, shell, radius, turn limit, and attempt limits in the
+   Inspector.
+2. `GenerateNextTower` searches for a valid new runtime seed. If an initial
+   generation ever exhausts its attempts, `R` retries; if replacement fails
+   during play, the current valid tower remains intact.
+3. `TryBuildStage` uses `System.Random(stageSeed)`, places a mandatory
    start/transition chunk, then builds a sequence from reusable candidates.
-4. Lines 532-583: candidate selection is separated from physical placement.
-5. Lines 585-700: entry-to-exit alignment plus rotation, transition height,
-   turn, clearance, tower-radius, and overlap validation.
-6. Lines 134-154 and 775-831: append ahead of the player and remove chunks only
-   after the flood has made them unreachable.
+4. `TrySelectAndPlaceChunk` separates candidate selection from physical
+   placement.
+5. `TryPlaceChunk` handles entry-to-exit alignment plus rotation, transition
+   height, turn, clearance, tower-radius, and overlap validation.
+6. `Update` appends ahead of the player, while `CleanupSubmergedChunks` removes
+   chunks only after the flood has made them unreachable.
 
 Open [`ChunkSelectionRules.cs`](../final_assignment/Assets/Game/Scripts/Gameplay/ChunkSelectionRules.cs),
 lines 28-99:
@@ -250,12 +252,14 @@ State the procedural-generation claim carefully:
 
 Open [`RunController.cs`](../final_assignment/Assets/Game/Scripts/Gameplay/RunController.cs):
 
-- Lines 125-161: track highest run height, report stage progress, calculate
+- `Update`: track highest run height, report stage progress, calculate
   flood clearance, and end the run on contact.
-- Lines 171-232: cancel/reset grapple and player state, generate a replacement
-  course transactionally, teleport to the start, reset physics, and restart the
+- `StartNewRun` and `StartRun`: cancel/reset grapple and player state, generate
+  a replacement tower transactionally, teleport to the start, reset physics,
+  and restart the
   hazard.
-- Lines 260-525: HUD, intro, result panel, and escalating visual flood warning.
+- `OnGUI` and the draw helpers: HUD, intro, result panel, and escalating visual
+  flood warning.
 
 Open [`RisingHazard.cs`](../final_assignment/Assets/Game/Scripts/Gameplay/RisingHazard.cs),
 lines 36-49 and 82-100:

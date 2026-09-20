@@ -87,26 +87,24 @@ GrappleController.cs       Single-hook lifecycle, rope feedback, zip pull, and r
 GrappleProjectile.cs       Ballistic flight, anchor collision, attachment, and return
 GrappleAnchor.cs           Valid target marker and presentation reference
 TowerChunk.cs              Entry, exit, bounds, difficulty, and metadata
-TowerGenerator.cs          Seeded placement, streaming window, validation, cleanup, and fallback
+TowerGenerator.cs          Seeded placement, streaming window, validation, and cleanup
 ChunkSelectionRules.cs     Deterministic selection rules for EditMode tests
 ChunkPlacementRules.cs     Turn-angle and protected-corridor geometry rules
 TowerStreamingRules.cs     Append, recycling, and deterministic stage-seed rules
 RisingHazard.cs            Stage-based hazard speed and player contact
 RunController.cs           Run state, score, death, and restart
-RunConfig.cs               Tuneable movement, grapple, hazard, and generation values
-HudController.cs           Height, warnings, seed, and run-end presentation
 ```
 
 `SkyhookAscent.Gameplay.asmdef` owns the runtime scripts. The small
 `SkyhookAscent.Tests.EditMode` assembly references it and tests only the plain
 chunk-selection and streaming rules. Thirteen prefab assets live under
-`Assets/Game/Prefabs/TowerChunks`; the authored `Course` remains a scene-owned
-fallback rather than becoming hidden generator data.
+`Assets/Game/Prefabs/TowerChunks`; runtime play is generated exclusively from
+that library.
 
-`FinishGoal` owns landing detection only for the authored fallback. Generated
-play is endless. `RunController` owns loss presentation and the restart input
-bridge, while `TowerGenerator` alone owns run seeds, transactional stage
-generation, transition palettes, and below-flood per-chunk cleanup.
+`RunController` owns flood-loss presentation and the restart input bridge, while
+`TowerGenerator` alone owns run seeds, transactional stage generation,
+transition palettes, and below-flood per-chunk cleanup. There is no finite goal
+or handcrafted fallback mode in the final game.
 
 Every chunk serializes an incoming direction, outgoing direction, and traversal
 clearance width captured from its real prefab geometry. Placement permits

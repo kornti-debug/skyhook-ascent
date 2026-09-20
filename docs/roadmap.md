@@ -12,7 +12,7 @@ Project: **Skyhook Ascent**
 | Player movement and camera | 4 h | Walk, run, jump, air control, and camera work in a test scene |
 | Grapple vertical slice | 8 h | Projectile arc, one-hook retrieval, automatic zip, release, and one landing feel good |
 | Run loop and rising hazard | 4 h | Start, climb, water death, height score, and restart work |
-| Procedural tower chunks | 6 h | Fixed-seed chunk assembly works with a safe authored fallback |
+| Procedural tower chunks | 6 h | Fixed-seed chunk assembly produces validated playable stages |
 | Aesthetics and feedback | 4 h | Tower readability, anchors, rope, lighting, fog, particles, and UI are coherent |
 | Tests, build, and fixes | 3 h | Clean compile, focused tests, packaged build, known limitations |
 | Video planning and recording | 6 h | 15-25 minute video and both submission artifacts are verified |
@@ -33,7 +33,7 @@ Project: **Skyhook Ascent**
 
 - Player movement and camera are responsive
 - Grounding and jumping are reliable
-- One handcrafted platform course is playable
+- Movement test platforms are playable
 
 ### Gate 3: grapple proof - hour 17
 
@@ -51,7 +51,7 @@ If this gate slips by more than two hours, simplify the hook before adding proce
 - Rising hazard creates pressure
 - Falling into it ends the run
 - Height score and restart work
-- A short authored tower produces the complete gameplay loop
+- A generated starter tower produces the complete gameplay loop
 
 ### Gate 5: procedural bonus candidate - hour 27
 
@@ -59,7 +59,6 @@ If this gate slips by more than two hours, simplify the hook before adding proce
 - Same seed produces the same sequence
 - Chunks align and do not visibly overlap
 - Required routes work with base abilities
-- Authored fallback remains available
 - A 24-chunk generated window is valid and playable before streaming is enabled
 - Endless generation appends ahead of the player and removes only chunks below
   the flood
@@ -89,9 +88,9 @@ The referenceable task breakdown and status live in
 1. Create the movement playground.
 2. Finish and verify movement before grappling.
 3. Prove one satisfying grapple sequence.
-4. Complete an authored start-climb-fail-restart run.
-5. Add deterministic procedural chunks without removing the authored fallback.
-6. Convert the proven finite generator into a bounded endless streaming window.
+4. Complete the start-climb-fail-restart run.
+5. Add deterministic procedural chunks with fixed-seed diagnostics.
+6. Convert the generator into a bounded endless streaming window.
 7. Add stage transitions and height-based material palettes.
 8. Improve readability and aesthetics.
 9. Freeze features, build, test, and record.

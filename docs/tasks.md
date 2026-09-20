@@ -77,20 +77,20 @@ Architecture used here: separate components only for real ownership
 (`GrappleController`, projectile, and anchor). No general ability framework,
 factory, service layer, or event bus.
 
-## M3 - Complete Authored Run
+## M3 - Complete Validation Run
 
-Goal: a short non-procedural course with the full start-climb-fail-restart loop.
+Goal: prove the full start-climb-fail-restart loop before procedural generation.
 
 | ID | Task | Estimate | Status | Verification |
 | --- | --- | ---: | --- | --- |
-| M3.1 | Extend the handcrafted course with jumps, one recovery platform, and two grapple sections | 0.75 h | Done | The route demonstrates all core movement |
+| M3.1 | Create a temporary validation route with jumps, one recovery platform, and two grapple sections | 0.75 h | Done | The route demonstrates all core movement before procedural generation |
 | M3.2 | Add the rising hazard and player contact/death | 0.75 h | Done | The hazard applies pressure and ends the run reliably |
-| M3.3 | Add run state, height score, session best, seed display, finish, and restart | 1.25 h | Done | One button cleanly resets player, hazard, score, and course state |
+| M3.3 | Add run state, height score, session best, seed display, failure, and restart | 1.25 h | Done | One button cleanly resets player, hazard, score, and course state |
 | M3.4 | Add minimal HUD and run-end panel | 0.5 h | Done | Gameplay and failure state are understandable without explanation |
-| M3.5 | Play-test and balance the authored run | 0.75 h | Done | Full loop works repeatedly before procedural work begins |
+| M3.5 | Play-test and balance the validation run | 0.75 h | Done | Full loop works repeatedly before procedural work begins |
 
-**Milestone exit:** this is the safe fallback submission version. Procedural
-generation must never be allowed to break this working loop.
+**Milestone exit:** the complete loop works before procedural generation is
+introduced, so the generator can be evaluated against known-good traversal.
 
 ## M4 - Deterministic Procedural Tower
 
@@ -103,13 +103,13 @@ reproducible, testable, and explainable.
 | M4.2 | Convert four validated sections and create eight derived variants | 1.25 h | Done | Twelve prefab shapes provide jump, zip, mixed, precision, mirrored, and recovery rhythms |
 | M4.3 | Implement plain-C# seeded chunk-selection and pacing rules | 1.0 h | Done | Five focused EditMode tests pass; a category may repeat twice but not three times when alternatives exist |
 | M4.4 | Align and rotate chunk prefabs from exit to entry | 1.0 h | Done | Seed `104729` builds a connected 24-chunk route ending near 97 m |
-| M4.5 | Add overlap, reverse-turn, protected-corridor, adjacent-approach, history, and fallback validation | 1.0 h | Done | Moved colliders synchronize before checks; seed `81189325` rejects the blocking zigzag/recovery pair and streams ten valid stages |
-| M4.6 | Add landing-based finish, generated-run restart, and longer hazard progression | 0.75 h | Done | The finite regression goal works; `R` resets the player and creates a fresh tower |
-| M4.7 | Stress-test random generated runs and replacement-course cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk course, one matching seed, and no fallback flashes |
+| M4.5 | Add overlap, reverse-turn, protected-corridor, adjacent-approach, history, and relaxed-constraint validation | 1.0 h | Done | Moved colliders synchronize before checks; seed `81189325` rejects the blocking zigzag/recovery pair and streams ten valid stages |
+| M4.6 | Add generated-run restart and longer hazard progression | 0.75 h | Done | `R` resets the player and creates a fresh tower |
+| M4.7 | Stress-test random generated runs and replacement-tower cleanup | 0.5 h | Done | Repeated runs keep one valid 24-chunk tower, one matching seed, and no empty-tower flashes |
 | M4.8 | Convert generation to a bounded endless window that appends ahead of the player | 2.0 h | Done | Ten-stage and ten-run stress checks appended valid stages without interrupting the active tower |
 | M4.9 | Remove generated chunks only after they are safely below the flood | 0.75 h | Done | Cleanup removes each submerged chunk and deletes a stage root once it becomes empty |
 | M4.10 | Add a round transition landing and rotating stage material palettes | 2.0 h | Done | The landing has a flat mesh collider, a validated 1.25 m upward jump, and cannot obstruct jump/headroom above any traversal platform or any grapple corridor |
-| M4.11 | Increase flood speed by generated stage and remove the normal finite finish | 1.0 h | Done | Generated runs end through flood contact; flood starts at 0.65 m/s and scales visibly with each stage |
+| M4.11 | Finalize the endless flood-loss mode and scale speed by generated stage | 1.0 h | Done | Runs end through flood contact; flood starts at 0.65 m/s and scales visibly with each stage |
 | M4.12 | Add editor-only debug flight for streaming inspection | 0.5 h | Done | F3 toggles collision-free flight with vertical movement and a speed boost; player builds remain unaffected |
 | M4.13 | Replace the low stage-boundary jump with a mandatory zip transition | 0.75 h | Done | Eight appended stress stages produced eight raised, anchored transitions and 216 valid chunks; the centered target remains inside base grapple range |
 
