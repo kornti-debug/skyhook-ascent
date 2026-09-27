@@ -1,6 +1,7 @@
 # Post-Submission Development Plan
 
-Status: both route-fork variants play-tested; straight alternative parked for refit
+Status: route variants and moving traversal work; the first three-choice
+stage-boundary perk slice is implemented and awaits Play Mode testing
 Project: **Skyhook Ascent**
 
 This plan covers optional development after the university assignment was
@@ -140,68 +141,105 @@ Fixed-seed Play Mode generation built full 24-chunk stages for seeds `10001`,
 `10001` produced the same sequence. Seed `10003` was rejected at chunk 10 with
 the expanded pool, though it succeeds with the original pool, so keep an eye
 on generation pressure when testing combinations. The normal randomized
-`GenerateNextTower` path produced a valid stage, and all 14 EditMode tests pass.
-Manual Play Mode testing has also confirmed that the mirrored variant is
-traversable; the baseline variant was tested earlier. Comparing relative route
-readability, grapple difficulty, and time saved remains the next step.
+`GenerateNextTower` path produced a valid stage, and the original 14 EditMode
+tests passed at this stage.
+Manual Play Mode testing has confirmed that both variants are traversable and
+neither blocks the player. Detailed comparison of relative route readability,
+grapple difficulty, and time saved can wait for later balance feedback.
 
 The parked straight draft is a starting point for study, not a template to
 promote unchanged. Do not widen the radius just to accommodate it; if future
 playtests show that bounded layouts cannot create enough variety, revisit the
 tower shape and its wall/placement rules as a separate feature.
 
-**Exit condition:** manual play confirms the two handed layouts read
-differently, the risky route clearly saves time, both routes remain reachable,
-and generated combinations remain dependable across several seeds.
+**Exit condition:** both handed layouts remain reachable and generated
+combinations are dependable across several seeds. The player has now manually
+tested both routes and reported that neither blocks traversal. Detailed timing
+and balance comparison can wait for later play feedback.
 
 ### P3 - Add one moving grapple anchor
 
-After a few stationary route shapes are reliable, make an optional risk route
-use one moving anchor. Keep its motion periodic and readable, with a clear
-travel boundary and timing that a player can learn. The shot remains a normal
-gravity-affected projectile; the target moves, but aim assist does not snap the
-shot to it.
+**Implementation status:** `RiskAnchor_01` in
+`Chunk_RouteFork_Mirrored` now moves smoothly ±0.4 m along the landing
+platform's local X axis on a 3.4-second cycle. It uses a kinematic,
+interpolated Rigidbody; the projectile remains gravity-affected and receives no
+aim assistance. The existing zip reads the anchor's live attachment position,
+so the player is pulled toward where the target actually is.
 
-The current grapple code reads an anchor's live attachment position during
-attachment and pulling, which is a useful starting point. The generator's
-clearance checks currently reason about the anchor's authored position, though.
-Before relying on moving anchors in generated play, validate the full swept
-area of the anchor and keep its motion away from blocked projectile corridors
-and unsafe landing positions.
+Generation validates that the full horizontal movement sweep stays inside the
+assigned landing footprint, includes the sweep in the chunk bounds, and
+protects five sampled projectile paths plus the swept anchor capsule from
+neighboring traversal clearances. The other grapple anchors remain stationary.
+All 21 EditMode tests pass. Fixed seed `10001` generated a full 24-chunk stage
+including the moving-anchor fork with no placement-clearance rejections.
 
-**Exit condition:** the anchor is readable, miss retrieval still works while
-the player moves, successful zips land safely, and fixed-seed tests cover its
-placement envelope.
+The player has confirmed the anchor motion is noticeable and makes the shot a
+little harder. Miss retrieval, zip landing, and nearby-chunk interaction still
+need a focused Play Mode test.
 
-### P4 - Try one extra movement feature
+**Exit condition:** manual play confirms the anchor is readable, miss
+retrieval still works while the player moves, successful zips land safely, and
+the moving sweep does not obstruct either route or adjacent chunks.
 
-Prototype one feature at a time. The strongest first candidate is a trampoline
-or spring platform in a dedicated chunk: it naturally supports upward motion
-and gives a distinct movement beat. A moving platform or one timed local hazard
-could be tested instead if it better complements the route-choice prototype.
+### P4 - Add one mid-route moving platform
 
-Do not combine a trampoline, moving platforms, multiple traps, and new surface
-physics in the first pass. Each changes timing or reachability and should earn
-its place through play testing.
+**Implementation status:** `SafeJump_03`, the third middle landing on the safe
+lane, now moves in both `Chunk_RouteFork` variants. It oscillates ±0.55 m along
+chunk-local X on a smooth 4.2-second cycle using a kinematic, interpolated
+Rigidbody. The fork entry, exit, and grapple landings remain stationary. In the
+mirrored variant, the moving platform is on the safe route and the moving hook
+target remains on the separate risk route.
 
-**Exit condition:** the feature adds a readable decision or satisfying movement
-moment without undermining the jump-and-grapple rhythm.
+The complete platform sweep is added to the chunk bounds. Before accepting a
+placement, the generator checks it against sibling colliders and protected
+traversal corridors from neighboring chunks; the chunk is rejected if the
+sweep intrudes. Fixed seed `10001` generated all 24 chunks, including the
+mirrored fork, with no direction or clearance rejections. Four quarter-turn
+placement checks pass, and all 21 EditMode tests pass.
 
-### P5 - Reassess run upgrades and enemies
+The player controller now identifies upward contacts with a moving platform
+and applies movement relative to the platform's calculated velocity, allowing
+the player to ride it without parenting the Rigidbody. Unity compiled the fix
+without errors and all 21 EditMode tests passed. The player confirmed that
+grounded carry works. The agreed takeoff behavior preserves the platform's
+full horizontal velocity, so the player drifts with it when jumping; the
+resulting jump feel still needs a focused Play Mode check.
 
-If runs still need more variation after route chunks are fun, try a very small
-temporary upgrade choice at a stage boundary. Prefer upgrades that change
-options without invalidating generated jumps, such as faster hook recovery or a
-single emergency recovery. Test jump-height and grapple-range changes carefully
-because they can bypass intended challenges.
+**Play-test questions:** Does the player stay carried smoothly while standing
+still and while moving? Can they jump onto and off it cleanly? Is the sweep
+slow and small enough to read, and does it leave adjacent platforms and grapple
+shots unobstructed?
 
-If an enemy is still desirable, begin with one telegraphed flying obstacle that
-disrupts or bumps the player. Add weapons only if combat becomes a deliberate
-new design pillar; they require their own aiming, feedback, balance, and enemy
-behavior work and can draw attention away from grapple traversal.
+**Exit condition:** the moving platform adds a readable timing beat without
+making the safe lane unreliable or blocking neighboring chunks.
 
-**Exit condition:** each added system supports the ascent and makes a run
-meaningfully more engaging. Otherwise remove it from the active plan.
+### P5 - Add a stage-boundary perk choice
+
+**Implementation status:** landing on each round stage-transition platform
+pauses the game and requires one choice from three fixed, stackable perks:
+
+- **Quick Recall:** missed-hook return speed increases by 35% of base speed per
+  pick. It does not alter aim, range, or successful zip speed.
+- **Climber's Pace:** ground walking/running speed increases by 10% per pick.
+  The air movement target and air acceleration remain at their baseline values.
+- **Light Feet:** jump height increases by 10% per pick; air steering is
+  unchanged.
+
+The player can choose with the three on-screen buttons or number keys 1–3. The
+flood and physics pause during the choice. Perk stacks reset on `R`. The HUD
+shows current stacks. Fixed offers keep the first test focused on whether each
+effect and the mandatory choice feel useful. Generated routes must remain
+completable with baseline stats; upgrades can enable optional skips.
+
+Unity compiles without project errors, and all 27 EditMode tests completed
+with no failures. Manual Play Mode testing confirmed that landing opens the
+choice, the game pauses until selection, perks stack, and `R` starts a fresh
+run. Perk balance can still be revisited after more playtesting.
+
+**Exit condition:** the menu appears exactly once on landing at every biome
+transition, all three choices apply and stack correctly, the flood resumes
+after selection, and restart restores base stats. The choice should feel like a
+useful build decision without making normal traversal controls surprising.
 
 ## When to polish
 
@@ -246,9 +284,15 @@ These ideas remain available, but are not commitments for the next slice:
 
 - More chunk shapes and arrangements
 - Collapsing platforms, timed vents, wind, or other local hazards
-- Moving platforms
+- Additional moving-platform variants and movement paths
 - Optional collectibles on difficult routes
 - A short-lived jetpack or defensive effect
+- A trajectory/impact preview while aiming, especially for moving grapple
+  anchors; treat it as a powerful upgrade rather than baseline assistance
+- Pickups that add tools such as a jetpack or bounce boots; defer tool switching
+  until the traversal loop demonstrates a need for it
+- Enemies and weapons; keep the current identity focused on climbing and
+  avoiding hazards until combat has a clear purpose
 - Surface-specific movement such as slippery ice
 - More stage themes and matching environmental behavior
 - A tower that widens by stage, with its shell and placement radius expanding
@@ -257,12 +301,9 @@ These ideas remain available, but are not commitments for the next slice:
 
 ## Recommended next increment
 
-Keep both bounded forks in the pool and compare the baseline and mirrored
-versions in Play Mode. Focus on whether the safe lane feels slower,
-whether the mirrored risky lane is clear and aimable, and whether both merge
-cleanly into the next chunk. Recheck fixed seeds `10001`, `10002`, `10004`, and
-`10006`; also watch how the generator handles seeds that cannot assemble with
-the expanded pool. Do not promote the parked long straight draft or widen the
-tower yet. Once the static route variants are fun and reliable, try one moving
-anchor and validate its full motion path before adding other mechanics or final
-art.
+The player has confirmed that landing opens the perk choice, gameplay pauses
+until selection, and picks stack across transitions. In a focused follow-up
+run, check the individual feel of Quick Recall, Climber's Pace, and Light Feet,
+then press `R` to confirm the menu and perk effects reset. Keep the trajectory
+preview, item drops, enemies, extra platform physics, the parked long straight
+draft, and tower-radius changes out of this test.

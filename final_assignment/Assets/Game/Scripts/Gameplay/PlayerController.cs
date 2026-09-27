@@ -43,10 +43,17 @@ namespace SkyhookAscent.Gameplay
         private float lastGroundedTime = float.NegativeInfinity;
         private float ignoreGroundUntil = float.NegativeInfinity;
         private float minimumGroundNormalY;
+        private float baseWalkSpeed;
+        private float baseRunSpeed;
+        private float baseJumpHeight;
+        private MovingPlatform movingSupport;
+        private TowerChunk groundedChunk;
+        private float lastMovingSupportTime = float.NegativeInfinity;
         private bool zipMovementActive;
         private bool movementEnabled = true;
 
         public bool IsGrounded => Time.time <= lastGroundedTime + coyoteTime;
+        public TowerChunk GroundedChunk => IsGrounded ? groundedChunk : null;
         public bool IsZipMovementActive => zipMovementActive;
         public bool MovementEnabled => movementEnabled;
         public float HorizontalSpeed
@@ -61,6 +68,9 @@ namespace SkyhookAscent.Gameplay
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
+            baseWalkSpeed = walkSpeed;
+            baseRunSpeed = runSpeed;
+            baseJumpHeight = jumpHeight;
             ConfigureBody();
             minimumGroundNormalY = Mathf.Cos(maximumGroundAngle * Mathf.Deg2Rad);
 
@@ -131,6 +141,7 @@ namespace SkyhookAscent.Gameplay
             {
                 jumpQueuedUntil = float.NegativeInfinity;
                 lastGroundedTime = float.NegativeInfinity;
+                ClearMovingSupport();
             }
         }
 
@@ -145,6 +156,7 @@ namespace SkyhookAscent.Gameplay
             moveInput = Vector2.zero;
             runHeld = false;
             jumpQueuedUntil = float.NegativeInfinity;
+            ClearMovingSupport();
 
             if (body != null)
             {
@@ -154,41 +166,65 @@ namespace SkyhookAscent.Gameplay
 
         public void ResetForNewRun()
         {
+            ApplyMovementPerkStacks(0, 0);
             movementEnabled = false;
             zipMovementActive = false;
             moveInput = Vector2.zero;
             runHeld = false;
             jumpQueuedUntil = float.NegativeInfinity;
             lastGroundedTime = float.NegativeInfinity;
+            groundedChunk = null;
             ignoreGroundUntil = Time.time + 0.1f;
+            ClearMovingSupport();
+        }
+
+        public void ApplyMovementPerkStacks(
+            int climbersPaceStacks,
+            int lightFeetStacks)
+        {
+            walkSpeed = baseWalkSpeed * RunPerkRules.GetMultiplier(
+                RunPerk.ClimbersPace,
+                climbersPaceStacks);
+            runSpeed = baseRunSpeed * RunPerkRules.GetMultiplier(
+                RunPerk.ClimbersPace,
+                climbersPaceStacks);
+            jumpHeight = baseJumpHeight * RunPerkRules.GetMultiplier(
+                RunPerk.LightFeet,
+                lightFeetStacks);
         }
 
         private void ApplyHorizontalMovement()
         {
             Vector3 velocity = body.linearVelocity;
+            Vector3 supportVelocity = GetMovingSupportVelocity();
             Vector3 horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
+            Vector3 relativeHorizontalVelocity = horizontalVelocity - supportVelocity;
             Vector3 moveDirection = GetCameraRelativeDirection(moveInput);
-            float targetSpeed = runHeld ? runSpeed : walkSpeed;
+            bool grounded = IsGrounded;
+            float targetSpeed = grounded
+                ? (runHeld ? runSpeed : walkSpeed)
+                : (runHeld ? baseRunSpeed : baseWalkSpeed);
             Vector3 targetVelocity = moveDirection * targetSpeed;
 
-            if (IsGrounded)
+            if (grounded)
             {
                 float acceleration = moveDirection.sqrMagnitude > 0.001f
                     ? groundAcceleration
                     : groundDeceleration;
-                horizontalVelocity = Vector3.MoveTowards(
-                    horizontalVelocity,
+                relativeHorizontalVelocity = Vector3.MoveTowards(
+                    relativeHorizontalVelocity,
                     targetVelocity,
                     acceleration * Time.fixedDeltaTime);
             }
             else if (moveDirection.sqrMagnitude > 0.001f)
             {
-                horizontalVelocity = Vector3.MoveTowards(
-                    horizontalVelocity,
+                relativeHorizontalVelocity = Vector3.MoveTowards(
+                    relativeHorizontalVelocity,
                     targetVelocity,
                     airAcceleration * Time.fixedDeltaTime);
             }
 
+            horizontalVelocity = relativeHorizontalVelocity + supportVelocity;
             body.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
         }
 
@@ -207,6 +243,7 @@ namespace SkyhookAscent.Gameplay
             jumpQueuedUntil = float.NegativeInfinity;
             lastGroundedTime = float.NegativeInfinity;
             ignoreGroundUntil = Time.time + 0.1f;
+            ClearMovingSupport();
         }
 
         private void ApplyVerticalGravity()
@@ -271,9 +308,44 @@ namespace SkyhookAscent.Gameplay
                 if (collision.GetContact(i).normal.y >= minimumGroundNormalY)
                 {
                     lastGroundedTime = Time.time;
+                    groundedChunk = collision.collider.GetComponentInParent<TowerChunk>();
+                    MovingPlatform platform = collision.rigidbody != null
+                        ? collision.rigidbody.GetComponent<MovingPlatform>()
+                        : null;
+                    if (platform == null)
+                    {
+                        platform = collision.collider.GetComponentInParent<MovingPlatform>();
+                    }
+
+                    if (platform != null)
+                    {
+                        movingSupport = platform;
+                        lastMovingSupportTime = Time.time;
+                    }
+
                     return;
                 }
             }
+        }
+
+        private Vector3 GetMovingSupportVelocity()
+        {
+            if (movingSupport == null ||
+                Time.time > lastMovingSupportTime + Time.fixedDeltaTime * 2f ||
+                !IsGrounded)
+            {
+                return Vector3.zero;
+            }
+
+            Vector3 velocity = movingSupport.GetWorldVelocity();
+            velocity.y = 0f;
+            return velocity;
+        }
+
+        private void ClearMovingSupport()
+        {
+            movingSupport = null;
+            lastMovingSupportTime = float.NegativeInfinity;
         }
 
         private void ConfigureBody()

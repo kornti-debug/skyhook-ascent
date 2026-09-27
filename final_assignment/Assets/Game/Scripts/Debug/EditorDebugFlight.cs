@@ -47,7 +47,7 @@ namespace SkyhookAscent.Gameplay
                 return;
             }
 
-            if (keyboard.f3Key.wasPressedThisFrame)
+            if (keyboard.tKey.wasPressedThisFrame)
             {
                 SetFlying(!flying);
             }
@@ -94,8 +94,8 @@ namespace SkyhookAscent.Gameplay
         {
             const int width = 430;
             string message = flying
-                ? "DEBUG FLIGHT ON - F3 exit | WASD move | Space/Ctrl height | Shift boost"
-                : "F3: Debug flight";
+                ? "DEBUG FLIGHT ON - T exit | WASD move | Space/Ctrl height | Shift boost"
+                : "T: Debug flight";
             GUI.Box(new Rect(12f, Screen.height - 42f, width, 28f), message);
         }
 #endif

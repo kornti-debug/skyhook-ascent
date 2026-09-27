@@ -581,6 +581,14 @@ namespace SkyhookAscent.Gameplay
                 instance.transform.position = attachmentPoint - entryOffset;
                 Physics.SyncTransforms();
 
+                if (!instance.HasValidMovingAnchorPlacements() ||
+                    !instance.HasValidMovingPlatformPlacements())
+                {
+                    clearanceRejections++;
+                    DeactivateAndDestroy(instance.gameObject);
+                    continue;
+                }
+
                 Bounds bounds = instance.GetWorldBounds();
                 float transitionRise = bounds.max.y - attachmentPoint.y;
                 bool transitionRiseAllowed = !requirePreviousSeparation ||

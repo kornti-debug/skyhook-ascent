@@ -25,7 +25,12 @@ A typical run should last several minutes and end when the accelerating flood ca
 The level is the interior of a hollow cylindrical tower:
 
 - Platforms attach to the inner wall or project into the central shaft.
-- Grapple anchors are centered in clear space above their intended landing platforms.
+- Grapple anchors sit in clear space above their intended landing platforms.
+  One anchor in the mirrored risk fork now oscillates a short distance while
+  remaining inside its own landing footprint.
+- The third safe-route landing (`SafeJump_03`) moves in both fork variants. It
+  slides along chunk-local X, separate from the risk route's moving grapple
+  target; chunk entry, exit, and zip landings stay fixed.
 - Chunks rotate around the vertical axis, creating an upward spiral without requiring one continuous staircase.
 - The central shaft provides space for readable projectile arcs, fast zip lines, and dramatic falls.
 - The camera follows the player inside the tower rather than showing the entire structure.
@@ -94,6 +99,9 @@ The first prototype may use a capsule and primitives. Character animation is not
   expands/flashes the anchor, and release produces a second white flash.
 - The rope shortens naturally as the distance closes; it is not a simulated pendulum
 - Grapple can be fired from the ground or in the air
+- In `Chunk_RouteFork_Mirrored`, the first risky-route anchor moves ±0.4 m
+  along its landing's local X axis on a 3.4-second cycle. This changes target
+  timing only; the shot remains ballistic and receives no aim assistance.
 
 Not included in the MVP:
 
@@ -159,6 +167,10 @@ Generation rules:
 12. If initial generation exhausts its attempts, report the failure and let `R`
     retry with new seeds. A failed replacement attempt during an active run keeps
     the current valid tower intact.
+13. Include moving elements' full sweeps in chunk bounds and validate them
+    against sibling colliders and protected traversal clearances. Keep moving
+    anchors within their assigned landing footprints and moving platforms clear
+    of neighboring routes.
 
 The current implementation starts with one validated 24-chunk stage and streams
 another complete stage before the player approaches the generated top. Each
@@ -202,6 +214,19 @@ are then removed.
 
 Every chunk must be tested with base movement and grapple values. Upgrades may make routes easier or unlock optional shortcuts, but required progression never depends on an upgrade.
 
+At each biome transition, landing on the round zip platform pauses gameplay and
+requires the player to choose one of three run-long perks. The starter choices
+are **Quick Recall** (+35% missed-hook return speed per pick), **Climber's Pace**
+(+10% ground walk/run speed per pick), and **Light Feet** (+10% jump height per
+pick). Perks stack and reset when a new tower starts. Climber's Pace does not
+raise the in-air movement target or air acceleration; Light Feet changes jump
+height but not air steering. Every generated route must remain completable with
+base stats, while stacked perks may make optional shortcuts possible.
+
+The first choice menu is fixed rather than randomized so its three effects can
+be tested cleanly. Longer grapple range and an aiming trajectory preview for
+moving anchors are later candidates, not part of this slice.
+
 ### Initial chunk set
 
 1. Start/warm-up platform
@@ -216,7 +241,7 @@ Post-submission working build: `Chunk_RouteFork` and its mirrored
 baseline version has been play-tested and reported to work well; the mirrored
 variant has also been tested in Play Mode and reported to work. Both offer an
 eight-platform safe route and a faster route with two grapple zips; each anchor
-is centered over its landing, and both routes jump to one shared exit. The
+starts over its landing, and both routes jump to one shared exit. The
 mirrored copy puts the risky lane on the opposite side while preserving the
 same entry and exit. The pair's derived bounds and entry-direction metadata
 have been recaptured from their current geometry. These larger variants remain
@@ -224,16 +249,29 @@ alongside the short chunks so pacing can alternate between compact and extended
 layouts. In fixed-seed generation checks, seeds `10001`, `10002`, `10004`, and
 `10006` built full 24-chunk stages that included the mirrored fork. Seed
 `10003` was rejected at chunk 10 with the expanded pool, while the original
-pool accepted it; a randomized `GenerateNextTower` check succeeded. The 14
-EditMode tests pass. Manual traversal of both variants now works; systematic
-comparison of their traversal time, readability, and balance remains open.
+pool accepted it; a randomized `GenerateNextTower` check succeeded. All 21
+EditMode tests now pass. Manual traversal of both variants works; systematic
+comparison of traversal time, readability, and balance remains open. The
+first risky anchor in the mirrored variant now moves ±0.4 m over its landing;
+the second anchor and the baseline fork remain stationary. Both routes have
+been manually tested without blocking traversal. The generator includes the
+mover's swept bounds and clearance paths in placement validation.
+Both fork variants now also move `SafeJump_03`, the third middle platform on the
+safe route, ±0.55 m along chunk-local X on a 4.2-second smooth cycle. Each
+platform is a kinematic Rigidbody. Its swept bounds are included in chunk
+placement validation, and the sweep must stay clear of sibling colliders and
+neighboring traversal corridors. The mirrored fork's moving grapple anchor is
+on its separate risk route. The player is carried while grounded and inherits
+the platform's full horizontal velocity on jump; this keeps motion continuous
+at takeoff instead of forcing a world-vertical launch.
 These post-submission additions are not part of the submitted build. A copied
 straight-looking alternative is parked in
 `final_assignment/Assets/Game/Prefabs/TowerChunks/Ideas/` and is not in the
 generator pool until its footprint and placement metadata are refit. The
 current cylindrical envelope stays unchanged; widening the tower by stage is
-deferred. A moving anchor remains planned only after the stationary route
-variants prove readable and fair; details and staging are in
+deferred. The moving-anchor implementation still needs hands-on testing for
+aim timing, misses, zip arrival, and interaction with nearby chunks; details
+and staging are in
 [`post-submission-roadmap.md`](post-submission-roadmap.md).
 
 ### Reusable chunk library
@@ -290,7 +328,7 @@ Generated play is endless and has no finish state. Flood contact ends the run.
 player, hazard, score, and grapple state to the start. The camera follows the
 reset player while preserving the player's current aim orientation.
 
-In the Unity Editor only, `F3` toggles collision-free debug flight for streaming
+In the Unity Editor only, `T` toggles collision-free debug flight for streaming
 and geometry inspection. Use `WASD` to move, `Space`/`E` to rise,
 `Left Ctrl`/`Q` to descend, and `Left Shift` to boost. The component is inert in
 player builds and is not part of the normal game rules.
@@ -338,7 +376,11 @@ Possible upgrades must not be required by generation:
 - One recovery from a fatal fall
 - Temporary hazard slowdown
 
-## Scope cuts
+## Assignment-era scope cuts
+
+These cuts describe the submitted university build. Post-submission work may
+revisit small run-only features when they improve the core climbing loop; the
+active continuation scope is tracked in [`post-submission-roadmap.md`](post-submission-roadmap.md).
 
 Cut in this order:
 
@@ -368,11 +410,28 @@ Never cut the responsive base movement, grapple, rising hazard, deterministic ch
   the displayed seed makes it reproducible.
 - Distant visible anchors can sometimes be hit to skip intermediate platforms.
   This is accepted as an intentional high-risk, time-saving skill shot.
+- The moving anchor is currently limited to one target in the mirrored fork.
+  Its generator footprint and clearance envelope are tested, and the player
+  confirmed the motion makes aiming slightly harder. Miss retrieval, zip
+  landing, and nearby-chunk interaction still need manual play.
+- The moving platform appears only in the two fork variants. Its generated
+  sweep passes conservative clearance checks. The player controller now tracks
+  grounded contact and preserves velocity relative to the moving platform so
+  the player is carried while standing on it. The chosen jump behavior inherits
+  its full horizontal motion. The player confirmed carry in Play Mode; jump
+  trajectory, edge behavior, and interaction with neighboring chunks still
+  need a hands-on check.
+- Perks are selected on landing on each stage-transition platform and reset on
+  a new run. The pure stacking rules are EditMode-tested; the player confirmed
+  the transition choice pauses gameplay and that repeated picks stack. Perk
+  balance and reset-on-`R` still merit a focused Play Mode spot-check.
 - Submerged chunks are destroyed rather than pooled. This is sufficient for the
   assignment scale but creates more allocations than a production pooling system.
 - The best-height value lasts only for the current application session.
 - The graded target is keyboard and mouse on Windows. Gamepad, other operating
   systems, unusual aspect ratios, and other hardware have not been fully tested.
-- Audio, a main menu, character animation, upgrades, collectibles, and persistent
-  progression are deliberate scope cuts. The complete loop communicates required
-  state through motion, shape, text, and visual feedback without them.
+- Audio, a main menu, character animation, collectibles, and persistent
+  progression remain deliberate scope cuts. The current run-only perk choice
+  is intentionally small; extra tools, weapons, and combat are not included.
+  The complete loop communicates required state through motion, shape, text,
+  and visual feedback without those systems.

@@ -53,12 +53,14 @@ namespace SkyhookAscent.Gameplay
         private LineRenderer ropeRenderer;
         private Material runtimeRopeMaterial;
         private float pullExpiresAt;
+        private float baseReturnSpeed;
         private bool grappleEnabled = true;
 
         public GrappleProjectile ActiveProjectile => activeProjectile;
         public bool HasActiveProjectile => activeProjectile != null;
         public bool IsPulling => activeAnchor != null;
         public bool CanFire => grappleEnabled && activeProjectile == null && !IsPulling;
+        public int QuickRecallStacks { get; private set; }
         public float MaximumRange => maximumRange;
         public Vector3 HookOriginPosition =>
             transform.position + Vector3.up * verticalSpawnOffset;
@@ -66,6 +68,7 @@ namespace SkyhookAscent.Gameplay
 
         private void Awake()
         {
+            baseReturnSpeed = returnSpeed;
             ownerColliders = GetComponentsInChildren<Collider>(true);
             playerBody = GetComponent<Rigidbody>();
             playerController = GetComponent<PlayerController>();
@@ -201,8 +204,17 @@ namespace SkyhookAscent.Gameplay
         public void ResetForNewRun()
         {
             grappleEnabled = true;
+            SetQuickRecallStacks(0);
             LastHitAnchor = null;
             ResetGrapple(true);
+        }
+
+        public void SetQuickRecallStacks(int stacks)
+        {
+            QuickRecallStacks = Mathf.Max(0, stacks);
+            returnSpeed = baseReturnSpeed * RunPerkRules.GetMultiplier(
+                RunPerk.QuickRecall,
+                QuickRecallStacks);
         }
 
         internal void HandleProjectileAttached(
@@ -370,4 +382,5 @@ namespace SkyhookAscent.Gameplay
             ropeWidth = Mathf.Max(0.005f, ropeWidth);
         }
     }
+
 }

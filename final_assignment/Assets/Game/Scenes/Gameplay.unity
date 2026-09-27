@@ -289,11 +289,11 @@ MonoBehaviour:
   runController: {fileID: 1267383180}
   player: {fileID: 705153450}
   hazard: {fileID: 1354439701}
-  seed: 104729
+  seed: 10001
   generatedChunkCount: 24
   recentHistoryLength: 2
   maximumSeedAttempts: 64
-  randomizeInitialSeed: 1
+  randomizeInitialSeed: 0
   generationAheadDistance: 35
   cleanupBelowWaterMargin: 2
   appendRetryDelay: 1

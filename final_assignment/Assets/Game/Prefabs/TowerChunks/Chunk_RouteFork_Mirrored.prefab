@@ -451,6 +451,8 @@ GameObject:
   - component: {fileID: 9113981417058843570}
   - component: {fileID: 6419329847819866699}
   - component: {fileID: 8064869181839154606}
+  - component: {fileID: 430908016516658147}
+  - component: {fileID: 4143046218215820111}
   m_Layer: 8
   m_Name: RiskAnchor_01
   m_TagString: Untagged
@@ -572,6 +574,50 @@ MonoBehaviour:
   distantEmissionColor: {r: 0, g: 0.8, b: 1.6, a: 1}
   inRangeCoreColor: {r: 0.35, g: 0.95, b: 1, a: 1}
   inRangeEmissionColor: {r: 0.4, g: 4.5, b: 6, a: 1}
+--- !u!54 &430908016516658147
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3384880047039980048}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &4143046218215820111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3384880047039980048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e389ee9b4c0905144a38994effd14505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkyhookAscent.Gameplay::SkyhookAscent.Gameplay.MovingGrappleAnchor
+  localTravelAxis: {x: 1, y: 0, z: 0}
+  travelDistance: 0.4
+  cycleDuration: 3.4
+  landingPlatform: {fileID: 3535753201951313582}
+  sweptRadius: 0.55
 --- !u!1 &4231185618159641841
 GameObject:
   m_ObjectHideFlags: 0
@@ -830,6 +876,8 @@ GameObject:
   - component: {fileID: 4442593331289477868}
   - component: {fileID: 311366387987447175}
   - component: {fileID: 91428529685619509}
+  - component: {fileID: 3296970755272403027}
+  - component: {fileID: 1496120980496791910}
   m_Layer: 0
   m_Name: SafeJump_03
   m_TagString: Untagged
@@ -930,6 +978,49 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &3296970755272403027
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5249448826197805594}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1496120980496791910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5249448826197805594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4006417b52d3c12438a29986fb9c4e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SkyhookAscent.Gameplay::SkyhookAscent.Gameplay.MovingPlatform
+  localTravelAxis: {x: 1, y: 0, z: 0}
+  travelDistance: 0.55
+  cycleDuration: 4.2
+  clearanceMargin: 0.12
 --- !u!1 &6450812686012542606
 GameObject:
   m_ObjectHideFlags: 0

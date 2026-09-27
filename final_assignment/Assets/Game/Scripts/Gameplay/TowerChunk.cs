@@ -39,6 +39,7 @@ namespace SkyhookAscent.Gameplay
         public Transform Entry => entry;
         public Transform Exit => exit;
         public string ChunkId => chunkId;
+        public bool IsStageTransition => chunkId == "stage-transition";
         public int Difficulty => difficulty;
         public int SelectionWeight => selectionWeight;
         public ChunkTraversalCategory TraversalCategory => traversalCategory;
@@ -64,7 +65,105 @@ namespace SkyhookAscent.Gameplay
             Vector3 axisY = transform.TransformVector(Vector3.up * localExtents.y);
             Vector3 axisZ = transform.TransformVector(Vector3.forward * localExtents.z);
             Vector3 worldExtents = Abs(axisX) + Abs(axisY) + Abs(axisZ);
-            return new Bounds(worldCenter, worldExtents * 2f);
+            Bounds bounds = new Bounds(worldCenter, worldExtents * 2f);
+
+            MovingGrappleAnchor[] movingAnchors =
+                GetComponentsInChildren<MovingGrappleAnchor>(true);
+            for (int i = 0; i < movingAnchors.Length; i++)
+            {
+                bounds.Encapsulate(movingAnchors[i].GetWorldSweptBounds());
+            }
+
+            MovingPlatform[] movingPlatforms =
+                GetComponentsInChildren<MovingPlatform>(true);
+            for (int i = 0; i < movingPlatforms.Length; i++)
+            {
+                bounds.Encapsulate(movingPlatforms[i].GetWorldSweptBounds());
+            }
+
+            return bounds;
+        }
+
+        public bool HasValidMovingAnchorPlacements()
+        {
+            MovingGrappleAnchor[] movingAnchors =
+                GetComponentsInChildren<MovingGrappleAnchor>(true);
+            for (int i = 0; i < movingAnchors.Length; i++)
+            {
+                if (!movingAnchors[i].IsSweepWithinLandingFootprint())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool HasValidMovingPlatformPlacements()
+        {
+            MovingPlatform[] movingPlatforms =
+                GetComponentsInChildren<MovingPlatform>(true);
+            if (movingPlatforms.Length == 0)
+            {
+                return true;
+            }
+
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            for (int platformIndex = 0;
+                platformIndex < movingPlatforms.Length;
+                platformIndex++)
+            {
+                MovingPlatform movingPlatform = movingPlatforms[platformIndex];
+                Bounds sweepBounds = movingPlatform.GetWorldSweptBounds();
+                sweepBounds.Expand(movingPlatform.ClearanceMargin * 2f);
+
+                List<Bounds> obstacleBounds = new List<Bounds>();
+                for (int colliderIndex = 0;
+                    colliderIndex < colliders.Length;
+                    colliderIndex++)
+                {
+                    Collider candidate = colliders[colliderIndex];
+                    if (candidate == null || !candidate.enabled ||
+                        candidate.isTrigger ||
+                        candidate == movingPlatform.PlatformCollider)
+                    {
+                        continue;
+                    }
+
+                    obstacleBounds.Add(candidate.bounds);
+                }
+
+                MovingGrappleAnchor[] movingAnchors =
+                    GetComponentsInChildren<MovingGrappleAnchor>(true);
+                for (int anchorIndex = 0;
+                    anchorIndex < movingAnchors.Length;
+                    anchorIndex++)
+                {
+                    obstacleBounds.Add(
+                        movingAnchors[anchorIndex].GetWorldSweptBounds());
+                }
+
+                for (int otherPlatformIndex = 0;
+                    otherPlatformIndex < movingPlatforms.Length;
+                    otherPlatformIndex++)
+                {
+                    MovingPlatform otherPlatform =
+                        movingPlatforms[otherPlatformIndex];
+                    if (otherPlatform != movingPlatform)
+                    {
+                        obstacleBounds.Add(otherPlatform.GetWorldSweptBounds());
+                    }
+                }
+
+                if (!MovingPlatformPlacementRules.IsSweepClear(
+                    sweepBounds,
+                    obstacleBounds))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void Configure(
@@ -203,10 +302,28 @@ namespace SkyhookAscent.Gameplay
             {
                 for (int i = 0; i < anchors.Length; i++)
                 {
-                    AppendClearanceSegment(
-                        output,
-                        source,
-                        anchors[i].AttachmentPosition);
+                    MovingGrappleAnchor movingAnchor =
+                        anchors[i].GetComponent<MovingGrappleAnchor>();
+                    if (movingAnchor == null)
+                    {
+                        AppendClearanceSegment(
+                            output,
+                            source,
+                            anchors[i].AttachmentPosition);
+                        continue;
+                    }
+
+                    List<Vector3> targetSamples = new List<Vector3>(5);
+                    movingAnchor.AppendTargetSweepSamples(targetSamples);
+                    for (int sampleIndex = 0;
+                        sampleIndex < targetSamples.Count;
+                        sampleIndex++)
+                    {
+                        AppendClearanceSegment(
+                            output,
+                            source,
+                            targetSamples[sampleIndex]);
+                    }
                 }
                 return;
             }
@@ -247,6 +364,12 @@ namespace SkyhookAscent.Gameplay
                 }
             }
 
+            if (MovingAnchorBlocksAnyClearance(clearances) ||
+                MovingPlatformBlocksAnyClearance(clearances))
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -280,6 +403,59 @@ namespace SkyhookAscent.Gameplay
                     clearance))
                 {
                     return true;
+                }
+            }
+
+            MovingGrappleAnchor[] movingAnchors =
+                GetComponentsInChildren<MovingGrappleAnchor>(true);
+            for (int i = 0; i < movingAnchors.Length; i++)
+            {
+                if (ChunkPlacementRules.ClearanceCapsulesOverlap(
+                    movingAnchors[i].GetWorldSweepClearance(),
+                    clearance))
+                {
+                    return true;
+                }
+            }
+
+            MovingPlatform[] movingPlatforms =
+                GetComponentsInChildren<MovingPlatform>(true);
+            for (int i = 0; i < movingPlatforms.Length; i++)
+            {
+                Bounds sweepBounds = movingPlatforms[i].GetWorldSweptBounds();
+                sweepBounds.Expand(movingPlatforms[i].ClearanceMargin * 2f);
+                if (ChunkPlacementRules.BoundsBlockSegment(
+                    sweepBounds,
+                    clearance))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool MovingAnchorBlocksAnyClearance(
+            IReadOnlyList<TraversalClearanceSegment> clearances)
+        {
+            MovingGrappleAnchor[] movingAnchors =
+                GetComponentsInChildren<MovingGrappleAnchor>(true);
+            for (int anchorIndex = 0;
+                anchorIndex < movingAnchors.Length;
+                anchorIndex++)
+            {
+                TraversalClearanceSegment sweep =
+                    movingAnchors[anchorIndex].GetWorldSweepClearance();
+                for (int clearanceIndex = 0;
+                    clearanceIndex < clearances.Count;
+                    clearanceIndex++)
+                {
+                    if (ChunkPlacementRules.ClearanceCapsulesOverlap(
+                        sweep,
+                        clearances[clearanceIndex]))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -455,6 +631,35 @@ namespace SkyhookAscent.Gameplay
                 Mathf.Max(0.1f, localBoundsSize.x),
                 Mathf.Max(0.1f, localBoundsSize.y),
                 Mathf.Max(0.1f, localBoundsSize.z));
+        }
+
+        private bool MovingPlatformBlocksAnyClearance(
+            IReadOnlyList<TraversalClearanceSegment> clearances)
+        {
+            MovingPlatform[] movingPlatforms =
+                GetComponentsInChildren<MovingPlatform>(true);
+            for (int platformIndex = 0;
+                platformIndex < movingPlatforms.Length;
+                platformIndex++)
+            {
+                Bounds sweepBounds =
+                    movingPlatforms[platformIndex].GetWorldSweptBounds();
+                sweepBounds.Expand(
+                    movingPlatforms[platformIndex].ClearanceMargin * 2f);
+                for (int clearanceIndex = 0;
+                    clearanceIndex < clearances.Count;
+                    clearanceIndex++)
+                {
+                    if (ChunkPlacementRules.BoundsBlockSegment(
+                        sweepBounds,
+                        clearances[clearanceIndex]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
