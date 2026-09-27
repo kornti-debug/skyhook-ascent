@@ -1,6 +1,6 @@
 # Implementation Task Board
 
-Status: Current Plan  
+Status: Assignment submitted; next development plan in [`post-submission-roadmap.md`](post-submission-roadmap.md)
 Project: **Skyhook Ascent**
 
 This is the day-to-day execution order. The broader time budget and scope gates
@@ -164,9 +164,9 @@ Goal: freeze features and prove the project can be graded reliably.
 | M6.2 | Test camera, input, grapple misses, falling recovery, death, and restart edge cases | 1.0 h | Done | Five unique seeds reset all run state; miss/retrieval, attach/release, flood death, restart, camera bounds, and cursor lock pass without runtime console issues |
 | M6.3 | Create and run a standalone Windows build | 0.75 h | Done | Clean Windows x64 build `Skyhook Ascent` 1.0.0 succeeds with zero errors; move, jump, grapple hit/miss, flood death, and `R` restart were manually confirmed |
 | M6.4 | Record honest known limitations and freeze scope | 0.5 h | Done | README, checklist, and `game-design.md` match the accepted build; no further gameplay features are planned |
-| M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Next | Gameplay is at most 7 minutes; project ZIP excludes `Library` |
+| M6.5 | Prepare the 15-25 minute recording and both upload artifacts | 6.0 h | Submitted | Final assignment artifacts submitted by the user |
 
-## Stretch backlog
+## Assignment-era stretch backlog
 
 Attempt only after M6.1-M6.4 pass:
 
@@ -178,10 +178,13 @@ Attempt only after M6.1-M6.4 pass:
 
 No stretch task may make a required generated route depend on an upgrade.
 
-## Immediate next action
+For continued development after submission, use the ordered plan in
+[`post-submission-roadmap.md`](post-submission-roadmap.md). It prioritizes a
+play-tested safe/risk chunk, then moving-anchor validation, before broader
+polish or additional systems.
 
-Begin **M6.5** with a short audio/screen test, then record the 15-25 minute video
-using [`video-plan.md`](video-plan.md). Keep the gameplay demonstration below
-seven minutes. After reviewing the recording, create the Unity project ZIP from
-`final_assignment/` without `Library`, generated build output, temporary folders,
-or local-only files, then download and test both final submission artifacts.
+## Assignment handoff
+
+The assignment task board ends at M6.5, which the user has submitted. For
+optional continued development, follow the next increment in
+[`post-submission-roadmap.md`](post-submission-roadmap.md).

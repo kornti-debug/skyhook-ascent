@@ -1,6 +1,6 @@
 # 40-Hour Roadmap
 
-Status: Current Plan  
+Status: Assignment submitted; continuation plan in [`post-submission-roadmap.md`](post-submission-roadmap.md)
 Project: **Skyhook Ascent**
 
 ## Time budget
@@ -100,6 +100,10 @@ The referenceable task breakdown and status live in
 | Date | Duration | Work completed | Next risk |
 | --- | ---: | --- | --- |
 | | | | |
+
+The 40-hour plan above records the assignment implementation and submission
+scope. New optional development is tracked separately in
+[`post-submission-roadmap.md`](post-submission-roadmap.md).
 
 ## Scope-cut order
 

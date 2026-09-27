@@ -191,6 +191,11 @@ namespace SkyhookAscent.Gameplay
                 return;
             }
 
+            if (propertyBlock == null)
+            {
+                propertyBlock = new MaterialPropertyBlock();
+            }
+
             targetRenderer.GetPropertyBlock(propertyBlock);
             propertyBlock.SetColor("_BaseColor", baseColor);
             propertyBlock.SetColor("_Color", baseColor);
