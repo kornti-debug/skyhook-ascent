@@ -30,19 +30,29 @@ The level is the interior of a hollow cylindrical tower:
 - The central shaft provides space for readable projectile arcs, fast zip lines, and dramatic falls.
 - The camera follows the player inside the tower rather than showing the entire structure.
 
-Every chunk has one entrance and one exit. Most chunks have one readable route. Selected chunks contain a short branch:
+Every chunk has one entry and one exit so the procedural generator can connect
+chunks as single building blocks. Most chunks keep one primary route. The
+post-submission working build adds one authored route-choice chunk whose two
+internal routes rejoin at the same exit:
 
 - **Safe route:** more platforms and easier jumps, but slower.
-- **Risk route:** fewer platforms and a demanding ballistic grapple shot, but faster.
-- Both routes rejoin at the chunk exit.
+- **Risk route:** fewer platforms and a demanding ballistic grapple challenge,
+  but faster.
 
-Mandatory grapple chunks ensure the main mechanic cannot be ignored.
+The safe lane uses eight ordinary platform landings and takes longer. The risk
+lane uses two skill-shot anchors, each centered above its own landing platform,
+then one final jump to the shared exit. It is deliberately a larger chunk than
+the library's short jump and grapple chunks, but its curved layout stays within
+the tower's placement limits. Keep both sizes in the pool; do not expand every
+chunk just to add variety. Mandatory grapple chunks remain useful so the core
+mechanic cannot be ignored.
 
 ## Core run loop
 
 1. Start a run with a displayed seed.
 2. Climb through generated tower chunks.
-3. Choose safe or risky routes when offered.
+3. Use jumps and grapple choices, including an optional safe-versus-fast route
+   in the authored route-choice chunk.
 4. The hazard rises and gradually accelerates.
 5. Generate more chunks ahead as the player climbs.
 6. Recycle chunks that are safely below the flood.
@@ -112,7 +122,7 @@ Not included in the MVP:
 
 The generator assembles handcrafted tower-chunk prefabs rather than placing arbitrary individual platforms.
 
-Each chunk provides:
+Each current chunk provides:
 
 - Entry transform
 - Exit transform
@@ -120,7 +130,11 @@ Each chunk provides:
 - Difficulty
 - Selection weight
 - Traversal category
-- Optional route-choice metadata
+- Traversal and clearance information used by placement validation
+
+Future route-choice chunks can keep their safe and risky paths inside the
+authored prefab and share its entry/exit. Additional generator metadata should
+be added only if specific branch-selection rules require it.
 
 Generation rules:
 
@@ -193,9 +207,34 @@ Every chunk must be tested with base movement and grapple values. Upgrades may m
 1. Start/warm-up platform
 2. Basic jump sequence
 3. Mandatory grapple across the shaft
-4. Safe jumps versus grapple shortcut
+4. Jump sections with optional long-range grapple shortcuts
 5. Recovery/rest section
 6. Raised round zip-transition landing between generated stages
+
+Post-submission working build: `Chunk_RouteFork` and its mirrored
+`Chunk_RouteFork_Mirrored` variant are in the generated chunk pool. The
+baseline version has been play-tested and reported to work well; the mirrored
+variant has also been tested in Play Mode and reported to work. Both offer an
+eight-platform safe route and a faster route with two grapple zips; each anchor
+is centered over its landing, and both routes jump to one shared exit. The
+mirrored copy puts the risky lane on the opposite side while preserving the
+same entry and exit. The pair's derived bounds and entry-direction metadata
+have been recaptured from their current geometry. These larger variants remain
+alongside the short chunks so pacing can alternate between compact and extended
+layouts. In fixed-seed generation checks, seeds `10001`, `10002`, `10004`, and
+`10006` built full 24-chunk stages that included the mirrored fork. Seed
+`10003` was rejected at chunk 10 with the expanded pool, while the original
+pool accepted it; a randomized `GenerateNextTower` check succeeded. The 14
+EditMode tests pass. Manual traversal of both variants now works; systematic
+comparison of their traversal time, readability, and balance remains open.
+These post-submission additions are not part of the submitted build. A copied
+straight-looking alternative is parked in
+`final_assignment/Assets/Game/Prefabs/TowerChunks/Ideas/` and is not in the
+generator pool until its footprint and placement metadata are refit. The
+current cylindrical envelope stays unchanged; widening the tower by stage is
+deferred. A moving anchor remains planned only after the stationary route
+variants prove readable and fair; details and staging are in
+[`post-submission-roadmap.md`](post-submission-roadmap.md).
 
 ### Reusable chunk library
 
@@ -275,7 +314,10 @@ Persistent high scores are optional.
 - `R` always returns the player to the start with a new displayed seed and tower.
 - Project compiles without project errors.
 
-## Stretch features
+## Assignment-era stretch features
+
+This list records the submission scope decisions. The active continuation
+priorities are in [`post-submission-roadmap.md`](post-submission-roadmap.md).
 
 In priority order:
 

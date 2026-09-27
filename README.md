@@ -6,7 +6,8 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 
 ## Current status
 
-- The feature set is frozen as a submission candidate.
+- The university assignment has been submitted. The submitted prototype remains
+  the playable baseline for optional continued development.
 - **Skyhook Ascent** is a playable endless vertical 3D platformer with responsive
   movement, a ballistic skill-shot zip grapple, deterministic procedural stages,
   an accelerating flood hazard, restart/death flow, and a compact HUD.
@@ -16,7 +17,10 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 - Unity compiles without project errors and all 14 focused EditMode tests pass.
 - A Windows x64 build (`Skyhook Ascent` 1.0.0) has been built and its complete
   move/jump/grapple/miss/death/restart loop has been manually verified.
-- Next task: **M6.5**, record the explanatory video and prepare the final project ZIP.
+- The optional post-submission prototype now includes two bounded route-fork
+  chunks: a safer jump lane and a faster, riskier grapple lane that rejoin.
+  The next check is comparing their readability and pacing. See the
+  [post-submission roadmap](docs/post-submission-roadmap.md).
 
 ## Start here
 
@@ -28,6 +32,8 @@ The Unity project lives in [`final_assignment/`](final_assignment/). Planning an
 6. [`docs/tasks.md`](docs/tasks.md) - actionable milestone task board
 7. [`docs/video-plan.md`](docs/video-plan.md) - final recording structure
 8. [`docs/mcp-setup.md`](docs/mcp-setup.md) - Unity/Codex connection record
+9. [`docs/post-submission-roadmap.md`](docs/post-submission-roadmap.md) - optional development and polish plan after assignment submission
+10. [`docs/development-workflow.md`](docs/development-workflow.md) - how design decisions, testing, commits, and pushes are handled
 
 ## Reference material
 
