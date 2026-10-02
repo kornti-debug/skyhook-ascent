@@ -975,7 +975,8 @@ namespace SkyhookAscent.Gameplay
             Renderer[] renderers = chunk.GetComponentsInChildren<Renderer>(true);
             for (int i = 0; i < renderers.Length; i++)
             {
-                if (renderers[i].GetComponentInParent<GrappleAnchor>() != null)
+                if (renderers[i].GetComponentInParent<GrappleAnchor>() != null ||
+                    renderers[i].GetComponentInParent<TrampolinePlatform>() != null)
                 {
                     continue;
                 }

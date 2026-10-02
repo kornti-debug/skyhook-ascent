@@ -75,6 +75,12 @@ mechanic cannot be ignored.
 - Fixed-height grounded jump with a deliberately fast rise and fall
 - Momentum retained when leaving platforms
 - Close third-person orbit camera with basic wall avoidance
+- **Current local experiment:** the player can pass upward through a chunk
+  platform from below, then land on its top while falling. A prototype route
+  fork adds a trampoline pad beside the ordinary jump route; its bounce can
+  carry the player through an overhead platform. Grapple anchors and side
+  contacts stay solid. Keep the collision and bounce changes only if a route
+  play-test shows that jumps and landings still feel clear.
 
 The first prototype may use a capsule and primitives. Character animation is not required for the MVP.
 

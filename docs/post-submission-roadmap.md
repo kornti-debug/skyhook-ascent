@@ -1,7 +1,8 @@
 # Post-Submission Development Plan
 
-Status: route variants and moving traversal work; the first three-choice
-stage-boundary perk slice is implemented and awaits Play Mode testing
+Status: route variants, moving traversal, and stage-boundary perks work; a
+trampoline route prototype is in the chunk pool, passed automated checks, and
+awaits hands-on route-feel play-testing
 Project: **Skyhook Ascent**
 
 This plan covers optional development after the university assignment was
@@ -241,6 +242,27 @@ transition, all three choices apply and stack correctly, the flood resumes
 after selection, and restart restores base stats. The choice should feel like a
 useful build decision without making normal traversal controls surprising.
 
+### P6 - Play-test the trampoline route prototype
+
+**Implementation status:** the player can pass through a `TowerChunk` platform
+from underneath, then collide with its top after clearing it. Grapple anchors
+and side contacts stay solid. The ignored collision is restored after the
+player clears the top or moves outside the platform footprint. EditMode rule
+tests and Play Mode physics tests confirm the pass-through, trampoline launch,
+and falling landing. `Chunk_TrampolineFork` is in the Gameplay chunk pool. It
+keeps the standard jump lane and puts a green trampoline pad on an optional
+parallel lane beneath one overhead platform.
+
+**Play-test questions:** Can the player steer a trampoline or boosted jump into
+the intended landing? Does the player understand why a platform caught them or
+let them through? Do platform tops still feel reliable to land on, especially
+when the run curves around the tower? Revert the mechanic if it removes too
+much decision-making or makes platform collisions hard to predict.
+
+**Exit condition:** several manual runs confirm that the optional bounce route
+is readable and fun, while the safe route, side contacts, and falling landings
+remain reliable. Adjust bounce strength or placement after that test.
+
 ## When to polish
 
 Use two polish passes instead of waiting until the end or polishing every new
@@ -301,9 +323,8 @@ These ideas remain available, but are not commitments for the next slice:
 
 ## Recommended next increment
 
-The player has confirmed that landing opens the perk choice, gameplay pauses
-until selection, and picks stack across transitions. In a focused follow-up
-run, check the individual feel of Quick Recall, Climber's Pace, and Light Feet,
-then press `R` to confirm the menu and perk effects reset. Keep the trajectory
-preview, item drops, enemies, extra platform physics, the parked long straight
-draft, and tower-radius changes out of this test.
+Run Skyhook Ascent and look for the green trampoline pad beside the ordinary
+jump lane in `Chunk_TrampolineFork`. Compare the safe route with the optional
+bounce through the overhead platform, then report whether the bounce height,
+air control, and landing feel good. Keep perk tuning and unrelated traversal
+ideas out of this test.

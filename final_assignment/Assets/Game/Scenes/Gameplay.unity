@@ -278,6 +278,7 @@ MonoBehaviour:
   - {fileID: 6972448983460348392, guid: f05aaddd71e1f324197c0a0418c163cf, type: 3}
   - {fileID: 933136116608217709, guid: c88b698f2c69f8d4fb3466247bf1bbfd, type: 3}
   - {fileID: 933136116608217709, guid: c69a17c8a5a8efa468538e39b5c7bbd7, type: 3}
+  - {fileID: 3254716697972796687, guid: b3d0befcf1a158ad18920b1b50c5a0b7, type: 3}
   stageMaterials:
   - {fileID: 2100000, guid: 5db1ee655b9b097478f857c0538ba46e, type: 2}
   - {fileID: 2100000, guid: 0c115e4adf6f02d4e8fc738fb3bf66c1, type: 2}

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -33,6 +34,7 @@ namespace SkyhookAscent.Gameplay
         [SerializeField, Range(0f, 89f)] private float maximumGroundAngle = 50f;
 
         private Rigidbody body;
+        private CapsuleCollider capsuleCollider;
         private InputActionMap gameplayMap;
         private InputAction moveAction;
         private InputAction runAction;
@@ -51,6 +53,8 @@ namespace SkyhookAscent.Gameplay
         private float lastMovingSupportTime = float.NegativeInfinity;
         private bool zipMovementActive;
         private bool movementEnabled = true;
+        private float verticalVelocityBeforePhysics;
+        private readonly List<Collider> ignoredOneWayPlatforms = new List<Collider>();
 
         public bool IsGrounded => Time.time <= lastGroundedTime + coyoteTime;
         public TowerChunk GroundedChunk => IsGrounded ? groundedChunk : null;
@@ -68,6 +72,7 @@ namespace SkyhookAscent.Gameplay
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
             baseWalkSpeed = walkSpeed;
             baseRunSpeed = runSpeed;
             baseJumpHeight = jumpHeight;
@@ -100,6 +105,7 @@ namespace SkyhookAscent.Gameplay
 
         private void OnDisable()
         {
+            ClearOneWayPlatformIgnores();
             gameplayMap?.Disable();
         }
 
@@ -123,14 +129,20 @@ namespace SkyhookAscent.Gameplay
 
         private void FixedUpdate()
         {
+            UpdateOneWayPlatformIgnores();
+
             if (gameplayMap == null || zipMovementActive || !movementEnabled)
             {
+                verticalVelocityBeforePhysics = body != null
+                    ? body.linearVelocity.y
+                    : 0f;
                 return;
             }
 
             ApplyHorizontalMovement();
             TryJump();
             ApplyVerticalGravity();
+            verticalVelocityBeforePhysics = body.linearVelocity.y;
         }
 
         public void SetZipMovementActive(bool active)
@@ -164,8 +176,27 @@ namespace SkyhookAscent.Gameplay
             }
         }
 
+        public void LaunchFromTrampoline(float launchSpeed)
+        {
+            if (body == null || launchSpeed <= 0f)
+            {
+                return;
+            }
+
+            Vector3 velocity = body.linearVelocity;
+            velocity.y = Mathf.Max(velocity.y, launchSpeed);
+            body.linearVelocity = velocity;
+            verticalVelocityBeforePhysics = velocity.y;
+            jumpQueuedUntil = float.NegativeInfinity;
+            lastGroundedTime = float.NegativeInfinity;
+            groundedChunk = null;
+            ignoreGroundUntil = Time.time + 0.1f;
+            ClearMovingSupport();
+        }
+
         public void ResetForNewRun()
         {
+            ClearOneWayPlatformIgnores();
             ApplyMovementPerkStacks(0, 0);
             movementEnabled = false;
             zipMovementActive = false;
@@ -288,12 +319,131 @@ namespace SkyhookAscent.Gameplay
 
         private void OnCollisionEnter(Collision collision)
         {
+            if (TryIgnoreOneWayPlatform(collision))
+            {
+                return;
+            }
+
             UpdateGroundedState(collision);
         }
 
         private void OnCollisionStay(Collision collision)
         {
+            if (TryIgnoreOneWayPlatform(collision))
+            {
+                return;
+            }
+
             UpdateGroundedState(collision);
+        }
+
+        private bool TryIgnoreOneWayPlatform(Collision collision)
+        {
+            Collider platform = collision.collider;
+            if (platform == null || platform.isTrigger ||
+                platform.GetComponentInParent<TowerChunk>() == null ||
+                platform.GetComponentInParent<GrappleAnchor>() != null)
+            {
+                return false;
+            }
+
+            Bounds playerBounds = capsuleCollider.bounds;
+            Bounds platformBounds = platform.bounds;
+            for (int i = 0; i < collision.contactCount; i++)
+            {
+                ContactPoint contact = collision.GetContact(i);
+                Vector3 platformToPlayerNormal;
+                if (contact.thisCollider == capsuleCollider &&
+                    contact.otherCollider == platform)
+                {
+                    platformToPlayerNormal = contact.normal;
+                }
+                else if (contact.otherCollider == capsuleCollider &&
+                    contact.thisCollider == platform)
+                {
+                    platformToPlayerNormal = -contact.normal;
+                }
+                else
+                {
+                    continue;
+                }
+
+                if (!OneWayPlatformRules.ShouldIgnoreUndersideCollision(
+                    playerBounds,
+                    platformBounds,
+                    platformToPlayerNormal))
+                {
+                    continue;
+                }
+
+                Physics.IgnoreCollision(capsuleCollider, platform, true);
+                if (verticalVelocityBeforePhysics > 0f &&
+                    body.linearVelocity.y < verticalVelocityBeforePhysics)
+                {
+                    Vector3 velocity = body.linearVelocity;
+                    velocity.y = verticalVelocityBeforePhysics;
+                    body.linearVelocity = velocity;
+                }
+
+                if (!ignoredOneWayPlatforms.Contains(platform))
+                {
+                    ignoredOneWayPlatforms.Add(platform);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void UpdateOneWayPlatformIgnores()
+        {
+            if (capsuleCollider == null)
+            {
+                return;
+            }
+
+            Bounds playerBounds = capsuleCollider.bounds;
+            for (int i = ignoredOneWayPlatforms.Count - 1; i >= 0; i--)
+            {
+                Collider platform = ignoredOneWayPlatforms[i];
+                if (platform == null || !platform.enabled ||
+                    !platform.gameObject.activeInHierarchy)
+                {
+                    ignoredOneWayPlatforms.RemoveAt(i);
+                    continue;
+                }
+
+                if (!OneWayPlatformRules.ShouldRestoreCollision(
+                    playerBounds,
+                    platform.bounds,
+                    body.linearVelocity.y))
+                {
+                    continue;
+                }
+
+                Physics.IgnoreCollision(capsuleCollider, platform, false);
+                ignoredOneWayPlatforms.RemoveAt(i);
+            }
+        }
+
+        private void ClearOneWayPlatformIgnores()
+        {
+            if (capsuleCollider != null && capsuleCollider.enabled &&
+                capsuleCollider.gameObject.activeInHierarchy)
+            {
+                for (int i = 0; i < ignoredOneWayPlatforms.Count; i++)
+                {
+                    Collider platform = ignoredOneWayPlatforms[i];
+                    if (platform != null && platform.enabled &&
+                        platform.gameObject.activeInHierarchy)
+                    {
+                        Physics.IgnoreCollision(capsuleCollider, platform, false);
+                    }
+                }
+            }
+
+            ignoredOneWayPlatforms.Clear();
         }
 
         private void UpdateGroundedState(Collision collision)
